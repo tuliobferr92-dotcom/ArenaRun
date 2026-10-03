@@ -14,6 +14,7 @@ import '../design_system/tokens.dart';
 import '../game_controller.dart';
 import '../widgets/card_hand_sheet.dart';
 import '../widgets/debug_panel.dart';
+import '../widgets/event_card_sheet.dart';
 import '../widgets/hud.dart';
 import '../widgets/map_view.dart';
 import 'home_screen.dart';
@@ -318,6 +319,28 @@ class _GameScreenState extends ConsumerState<GameScreen>
     );
   }
 
+  void _showEventCards(GameState state) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: ReinosColors.surface,
+      isScrollControlled: true,
+      builder: (sheetContext) => EventCardSheet(
+        eventCards: state.currentPlayer.eventCards,
+        selectedOwnTerritoryId: _selectedOwnId,
+        onPlay: (eventCardId, {targetTerritoryId}) {
+          final controller = ref.read(gameControllerProvider.notifier);
+          controller.playEventCard(eventCardId, targetTerritoryId: targetTerritoryId);
+          final error = controller.lastError;
+          if (error != null) {
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error)));
+          } else {
+            Navigator.of(sheetContext).pop();
+          }
+        },
+      ),
+    );
+  }
+
   void _showObjective(GameState state) {
     showDialog(
       context: context,
@@ -375,6 +398,7 @@ class _GameScreenState extends ConsumerState<GameScreen>
               onShowObjective: () => _showObjective(state),
               onSaveAndExit: _saveAndExit,
               onShowHand: () => _showHand(state),
+              onShowEventCards: () => _showEventCards(state),
             ),
           ),
           if (selected != null)

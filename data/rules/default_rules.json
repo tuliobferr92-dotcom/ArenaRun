@@ -7,5 +7,7 @@
   "initialPlacementExtraArmies": 3,
   "minTerritoriesForObjective": 10,
   "cardTradeInSequence": [4, 6, 8, 10, 12, 15],
-  "cardTradeInIncrementAfterSequence": 5
+  "cardTradeInIncrementAfterSequence": 5,
+  "eventCardReconstrucaoBonus": 3,
+  "eventCardSabedoriaBonus": 2
 }

@@ -107,6 +107,23 @@ class AnswerChallengeAction extends GameAction {
   });
 }
 
+/// Plays a special event card (section 20). [targetTerritoryId] is only
+/// used by `reconstrucao` (which owned territory to reinforce) — the
+/// other two types ignore it.
+class PlayEventCardAction extends GameAction {
+  final String eventCardId;
+  final String? targetTerritoryId;
+
+  const PlayEventCardAction({
+    required super.gameId,
+    required super.playerId,
+    required super.timestamp,
+    required super.sequenceNumber,
+    required this.eventCardId,
+    this.targetTerritoryId,
+  });
+}
+
 class EndPhaseAction extends GameAction {
   const EndPhaseAction({
     required super.gameId,

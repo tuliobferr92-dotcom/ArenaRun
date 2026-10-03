@@ -1,4 +1,5 @@
 import 'bot_difficulty.dart';
+import 'event_card.dart';
 import 'objective.dart';
 import 'player_color.dart';
 import 'territory_card.dart';
@@ -21,6 +22,10 @@ class Player {
   final Set<String> answeredChallengeIds;
   final int correctChallengeAnswers;
 
+  /// Special event cards in hand (section 20) — earned by answering a
+  /// Bible challenge correctly (GAME_RULES.md "Cartas de evento").
+  final List<EventCard> eventCards;
+
   const Player({
     required this.id,
     required this.displayName,
@@ -34,6 +39,7 @@ class Player {
     this.isEliminated = false,
     this.answeredChallengeIds = const {},
     this.correctChallengeAnswers = 0,
+    this.eventCards = const [],
   });
 
   Map<String, dynamic> toJson() => {
@@ -49,6 +55,7 @@ class Player {
         'isEliminated': isEliminated,
         'answeredChallengeIds': answeredChallengeIds.toList(),
         'correctChallengeAnswers': correctChallengeAnswers,
+        'eventCards': eventCards.map((c) => c.toJson()).toList(),
       };
 
   factory Player.fromJson(Map<String, dynamic> json) {
@@ -70,6 +77,9 @@ class Player {
       answeredChallengeIds:
           (json['answeredChallengeIds'] as List? ?? []).cast<String>().toSet(),
       correctChallengeAnswers: json['correctChallengeAnswers'] as int? ?? 0,
+      eventCards: (json['eventCards'] as List? ?? [])
+          .map((c) => EventCard.fromJson(c as Map<String, dynamic>))
+          .toList(),
     );
   }
 
@@ -80,6 +90,7 @@ class Player {
     bool? isEliminated,
     Set<String>? answeredChallengeIds,
     int? correctChallengeAnswers,
+    List<EventCard>? eventCards,
   }) {
     return Player(
       id: id,
@@ -94,6 +105,7 @@ class Player {
       isEliminated: isEliminated ?? this.isEliminated,
       answeredChallengeIds: answeredChallengeIds ?? this.answeredChallengeIds,
       correctChallengeAnswers: correctChallengeAnswers ?? this.correctChallengeAnswers,
+      eventCards: eventCards ?? this.eventCards,
     );
   }
 }

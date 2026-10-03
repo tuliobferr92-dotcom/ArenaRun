@@ -69,6 +69,20 @@ Todos os 5 tipos da seção 18 estão implementados:
 - `GameEngine.newMatch` distribui os 5 tipos ciclicamente entre os jogadores para garantir
   variedade a cada partida.
 
+## Cartas de evento (seção 20)
+- Separadas das cartas territoriais. Não têm acquisição por conquista — são a recompensa por
+  **responder corretamente** um desafio bíblico (liga mecanicamente o loop de aprendizado ao
+  loop estratégico: GAME → CURIOSIDADE → DESCOBERTA → BÍBLIA → vantagem no jogo).
+- Três tipos, efeitos configuráveis via `RulesConfig` (nunca hardcoded):
+  - **Reconstrução** (tema: Neemias) — fortifica instantaneamente um território próprio
+    (`+eventCardReconstrucaoBonus` exércitos). Exige escolher o território alvo.
+  - **Sabedoria** (tema: Salomão) — concede `+eventCardSabedoriaBonus` reforços imediatos; só
+    pode ser jogada durante a fase de Reforços.
+  - **Tempo de Fartura** (tema: José) — compra uma carta territorial do topo do baralho na hora,
+    sem precisar ter conquistado nada neste turno.
+- Como em toda mecânica inspirada em temas bíblicos (ver `BIBLE_CONTENT_GUIDELINES.md` regra 3),
+  o efeito de jogo nunca é apresentado como sendo literalmente o significado do texto.
+
 ## Domínio Regional (seção 17)
 - O bônus de reforço por controlar uma região inteira (`Region.controlBonus`) já é recalculado
   a cada turno pelo `ReinforcementCalculator`, independente de qualquer flag — vale mesmo que o

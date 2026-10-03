@@ -17,6 +17,13 @@ class RulesConfig {
   final List<int> cardTradeInSequence;
   final int cardTradeInIncrementAfterSequence;
 
+  /// Event card effect magnitudes (section 20) — never hardcoded in
+  /// `GameEngine`. "Reconstrução" reinforces a chosen owned territory by
+  /// this many armies; "Sabedoria" grants this many immediate
+  /// reinforcements during the reinforcement phase.
+  final int eventCardReconstrucaoBonus;
+  final int eventCardSabedoriaBonus;
+
   const RulesConfig({
     required this.minReinforcements,
     required this.territoriesPerReinforcement,
@@ -27,6 +34,8 @@ class RulesConfig {
     required this.minTerritoriesForObjective,
     this.cardTradeInSequence = const [4, 6, 8, 10, 12, 15],
     this.cardTradeInIncrementAfterSequence = 5,
+    this.eventCardReconstrucaoBonus = 3,
+    this.eventCardSabedoriaBonus = 2,
   });
 
   int cardTradeInReward(int tradeInsCompletedBefore) {
@@ -51,6 +60,8 @@ class RulesConfig {
           : const [4, 6, 8, 10, 12, 15],
       cardTradeInIncrementAfterSequence:
           json['cardTradeInIncrementAfterSequence'] as int? ?? 5,
+      eventCardReconstrucaoBonus: json['eventCardReconstrucaoBonus'] as int? ?? 3,
+      eventCardSabedoriaBonus: json['eventCardSabedoriaBonus'] as int? ?? 2,
     );
   }
 
@@ -64,6 +75,8 @@ class RulesConfig {
         'minTerritoriesForObjective': minTerritoriesForObjective,
         'cardTradeInSequence': cardTradeInSequence,
         'cardTradeInIncrementAfterSequence': cardTradeInIncrementAfterSequence,
+        'eventCardReconstrucaoBonus': eventCardReconstrucaoBonus,
+        'eventCardSabedoriaBonus': eventCardSabedoriaBonus,
       };
 
   static const RulesConfig defaults = RulesConfig(

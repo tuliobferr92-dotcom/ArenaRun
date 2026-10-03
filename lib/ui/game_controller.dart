@@ -159,6 +159,17 @@ class GameController extends StateNotifier<GameState?> {
         ));
   }
 
+  void playEventCard(String eventCardId, {String? targetTerritoryId}) {
+    _dispatch((gameId, seq) => PlayEventCardAction(
+          gameId: gameId,
+          playerId: state!.currentPlayer.id,
+          timestamp: DateTime.now(),
+          sequenceNumber: seq,
+          eventCardId: eventCardId,
+          targetTerritoryId: targetTerritoryId,
+        ));
+  }
+
   void endPhase() {
     _dispatch((gameId, seq) => EndPhaseAction(
           gameId: gameId,

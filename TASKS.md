@@ -168,8 +168,18 @@
 - [x] 19 testes novos (10 de engine/conteúdo + 3 de validação do JSON semente + 6 de widget).
 - Suite completa: **170/170 testes passando**, analyzer limpo, build web compilando.
 
+## Fase 2 (completa) — Cartas de evento
+
+- [x] `EventCardType` (reconstrucao/sabedoria/tempoDeFartura) + `EventCard`; efeitos em
+  `RulesConfig` (nada hardcoded). Ganhas ao responder um desafio bíblico corretamente — liga o
+  loop de aprendizado ao loop estratégico.
+- [x] `GameEngine._playEventCard`: reconstrução exige território próprio como alvo; sabedoria só
+  na fase de reforços; tempo de fartura compra carta territorial mesmo sem conquista no turno.
+- [x] UI: botão de cartas especiais no HUD (badge com contagem) + `EventCardSheet`.
+- [x] 12 testes novos (8 de engine + 4 de widget).
+- Suite completa: **182/182 testes passando**, analyzer limpo.
+
 ## Fora desta fase (ver ROADMAP.md)
-- [ ] Cartas de evento (Reconstrução, Sabedoria, Tempo de Fartura)
 - [ ] Codex/Enciclopédia completo, Timeline visual, Biblical Knowledge Score por categoria,
   spaced repetition (seções 25/28/32/33) — a base de dados e o pipeline editorial já existem;
   falta a UI de navegação e o cálculo de progresso por categoria.

@@ -1,4 +1,5 @@
 import '../domain/bot_difficulty.dart';
+import '../domain/event_card.dart';
 import '../domain/game_map.dart';
 import '../domain/objective.dart';
 import '../domain/player.dart';
@@ -197,6 +198,7 @@ class GameEngine {
       MoveArmyAction a => _moveArmy(state, a),
       PlayCardAction a => _playCard(state, a),
       AnswerChallengeAction a => _answerChallenge(state, a),
+      PlayEventCardAction a => _playEventCard(state, a),
       EndPhaseAction a => _endPhase(state, a),
       _ => throw InvalidActionException('Ação desconhecida: ${action.runtimeType}'),
     };
@@ -446,16 +448,88 @@ class GameEngine {
       throw const InvalidActionException('Este desafio já foi respondido.');
     }
 
+    // A correct answer earns a random event card (section 20) — the
+    // tangible reward loop the product vision calls for: GAME → CURIOSIDADE
+    // → DESCOBERTA → BÍBLIA, and back into the game as a strategic option.
+    EventCard? earnedCard;
+    if (action.correct) {
+      final type = EventCardType.values[state.rng.nextInt(EventCardType.values.length)];
+      earnedCard = EventCard(id: 'event_${action.challengeId}_${player.id}', type: type);
+    }
+
     final players = state.players.map((p) {
       if (p.id != player.id) return p;
       return p.copyWith(
         answeredChallengeIds: {...p.answeredChallengeIds, action.challengeId},
-        correctChallengeAnswers:
-            p.correctChallengeAnswers + (action.correct ? 1 : 0),
+        correctChallengeAnswers: p.correctChallengeAnswers + (action.correct ? 1 : 0),
+        eventCards: earnedCard != null ? [...p.eventCards, earnedCard] : p.eventCards,
       );
     }).toList();
 
     return state.copyWith(players: players);
+  }
+
+  // ---------------------------------------------------------------------
+  // EVENT CARDS (section 20) — mechanically-themed effects; see
+  // BIBLE_CONTENT_GUIDELINES.md rule 3: the effect is never presented as
+  // literally being the biblical event itself.
+  // ---------------------------------------------------------------------
+
+  static GameState _playEventCard(GameState state, PlayEventCardAction action) {
+    final player = state.currentPlayer;
+    EventCard? card;
+    for (final c in player.eventCards) {
+      if (c.id == action.eventCardId) {
+        card = c;
+        break;
+      }
+    }
+    if (card == null) {
+      throw const InvalidActionException('Jogador não possui esta carta de evento.');
+    }
+    final playedCardId = card.id;
+
+    GameState next;
+    switch (card.type) {
+      case EventCardType.reconstrucao:
+        final targetId = action.targetTerritoryId;
+        final target = targetId != null ? state.territories[targetId] : null;
+        if (target == null || target.ownerId != player.id) {
+          throw const InvalidActionException(
+              'Reconstrução exige um território próprio como alvo.');
+        }
+        final territories = Map.of(state.territories);
+        territories[target.id] =
+            target.copyWith(armyCount: target.armyCount + state.rules.eventCardReconstrucaoBonus);
+        next = state.copyWith(territories: territories);
+
+      case EventCardType.sabedoria:
+        if (state.phase != GamePhase.reinforcement) {
+          throw const InvalidActionException(
+              'Sabedoria só pode ser usada durante a fase de reforços.');
+        }
+        next = state.copyWith(
+          pendingReinforcements: state.pendingReinforcements + state.rules.eventCardSabedoriaBonus,
+        );
+
+      case EventCardType.tempoDeFartura:
+        if (state.deck.isEmpty) {
+          throw const InvalidActionException('O baralho de cartas territoriais está vazio.');
+        }
+        final deck = List.of(state.deck);
+        final drawn = deck.removeAt(0);
+        final players = state.players
+            .map((p) => p.id == player.id ? p.copyWith(cards: [...p.cards, drawn]) : p)
+            .toList();
+        next = state.copyWith(deck: deck, players: players);
+    }
+
+    final updatedPlayers = next.players
+        .map((p) => p.id == player.id
+            ? p.copyWith(eventCards: p.eventCards.where((c) => c.id != playedCardId).toList())
+            : p)
+        .toList();
+    return next.copyWith(players: updatedPlayers);
   }
 
   // ---------------------------------------------------------------------
