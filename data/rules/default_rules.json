@@ -1,0 +1,9 @@
+{
+  "minReinforcements": 3,
+  "territoriesPerReinforcement": 3,
+  "maxDiceAttacker": 3,
+  "maxDiceDefender": 2,
+  "startingArmiesPerTerritory": 2,
+  "initialPlacementExtraArmies": 3,
+  "minTerritoriesForObjective": 10
+}

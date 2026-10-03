@@ -1,0 +1,644 @@
+{
+  "id": "biblical_lands_v1",
+  "name": "Terras Bíblicas",
+  "periodId": "united_monarchy_stylized",
+  "regions": [
+    {
+      "id": "canaa",
+      "name": "Canaã",
+      "controlBonus": 3,
+      "territoryIds": [
+        "jerusalem",
+        "jerico",
+        "hebrom",
+        "belem",
+        "siquem",
+        "betel"
+      ]
+    },
+    {
+      "id": "filistia",
+      "name": "Filístia",
+      "controlBonus": 2,
+      "territoryIds": [
+        "gaza",
+        "ascalom",
+        "asdode",
+        "gate"
+      ]
+    },
+    {
+      "id": "fenicia",
+      "name": "Fenícia",
+      "controlBonus": 1,
+      "territoryIds": [
+        "tiro",
+        "sidom"
+      ]
+    },
+    {
+      "id": "transjordania",
+      "name": "Transjordânia",
+      "controlBonus": 2,
+      "territoryIds": [
+        "damasco",
+        "moabe",
+        "edom",
+        "amom"
+      ]
+    }
+  ],
+  "territories": [
+    {
+      "id": "jerusalem",
+      "name": "Jerusalém",
+      "regionId": "canaa",
+      "neighbors": [
+        "jerico",
+        "hebrom",
+        "betel",
+        "belem",
+        "amom"
+      ],
+      "polygon": [
+        [
+          310,
+          365
+        ],
+        [
+          390,
+          365
+        ],
+        [
+          390,
+          435
+        ],
+        [
+          310,
+          435
+        ]
+      ],
+      "centroid": [
+        350,
+        400
+      ],
+      "biblicalReferences": [
+        "2 Samuel 5"
+      ],
+      "historicalPeriodId": "united_monarchy_stylized",
+      "description": "Capital de Davi, cidade central de Canaã."
+    },
+    {
+      "id": "jerico",
+      "name": "Jericó",
+      "regionId": "canaa",
+      "neighbors": [
+        "jerusalem",
+        "betel",
+        "amom"
+      ],
+      "polygon": [
+        [
+          390,
+          365
+        ],
+        [
+          470,
+          365
+        ],
+        [
+          470,
+          435
+        ],
+        [
+          390,
+          435
+        ]
+      ],
+      "centroid": [
+        430,
+        400
+      ],
+      "biblicalReferences": [
+        "Josué 6"
+      ],
+      "historicalPeriodId": "united_monarchy_stylized",
+      "description": "Primeira cidade conquistada na entrada em Canaã."
+    },
+    {
+      "id": "hebrom",
+      "name": "Hebrom",
+      "regionId": "canaa",
+      "neighbors": [
+        "jerusalem",
+        "belem",
+        "gate",
+        "edom"
+      ],
+      "polygon": [
+        [
+          300,
+          485
+        ],
+        [
+          380,
+          485
+        ],
+        [
+          380,
+          555
+        ],
+        [
+          300,
+          555
+        ]
+      ],
+      "centroid": [
+        340,
+        520
+      ],
+      "biblicalReferences": [
+        "Gênesis 23"
+      ],
+      "historicalPeriodId": "united_monarchy_stylized",
+      "description": "Cidade dos patriarcas, onde Abraão viveu."
+    },
+    {
+      "id": "belem",
+      "name": "Belém",
+      "regionId": "canaa",
+      "neighbors": [
+        "jerusalem",
+        "hebrom",
+        "gate"
+      ],
+      "polygon": [
+        [
+          290,
+          415
+        ],
+        [
+          370,
+          415
+        ],
+        [
+          370,
+          485
+        ],
+        [
+          290,
+          485
+        ]
+      ],
+      "centroid": [
+        330,
+        450
+      ],
+      "biblicalReferences": [
+        "Rute 1",
+        "Miquéias 5:2"
+      ],
+      "historicalPeriodId": "united_monarchy_stylized",
+      "description": "Cidade natal de Davi."
+    },
+    {
+      "id": "siquem",
+      "name": "Siquém",
+      "regionId": "canaa",
+      "neighbors": [
+        "betel",
+        "tiro",
+        "damasco"
+      ],
+      "polygon": [
+        [
+          290,
+          225
+        ],
+        [
+          370,
+          225
+        ],
+        [
+          370,
+          295
+        ],
+        [
+          290,
+          295
+        ]
+      ],
+      "centroid": [
+        330,
+        260
+      ],
+      "biblicalReferences": [
+        "Josué 24"
+      ],
+      "historicalPeriodId": "united_monarchy_stylized",
+      "description": "Cidade de alianças e renovação de pactos."
+    },
+    {
+      "id": "betel",
+      "name": "Betel",
+      "regionId": "canaa",
+      "neighbors": [
+        "jerusalem",
+        "jerico",
+        "siquem"
+      ],
+      "polygon": [
+        [
+          280,
+          305
+        ],
+        [
+          360,
+          305
+        ],
+        [
+          360,
+          375
+        ],
+        [
+          280,
+          375
+        ]
+      ],
+      "centroid": [
+        320,
+        340
+      ],
+      "biblicalReferences": [
+        "Gênesis 28"
+      ],
+      "historicalPeriodId": "united_monarchy_stylized",
+      "description": "Local da visão de Jacó."
+    },
+    {
+      "id": "gaza",
+      "name": "Gaza",
+      "regionId": "filistia",
+      "neighbors": [
+        "ascalom",
+        "edom"
+      ],
+      "polygon": [
+        [
+          90,
+          565
+        ],
+        [
+          170,
+          565
+        ],
+        [
+          170,
+          635
+        ],
+        [
+          90,
+          635
+        ]
+      ],
+      "centroid": [
+        130,
+        600
+      ],
+      "biblicalReferences": [
+        "Juízes 16"
+      ],
+      "historicalPeriodId": "united_monarchy_stylized",
+      "description": "Cidade filisteia na costa sul."
+    },
+    {
+      "id": "ascalom",
+      "name": "Ascalom",
+      "regionId": "filistia",
+      "neighbors": [
+        "gaza",
+        "asdode"
+      ],
+      "polygon": [
+        [
+          110,
+          505
+        ],
+        [
+          190,
+          505
+        ],
+        [
+          190,
+          575
+        ],
+        [
+          110,
+          575
+        ]
+      ],
+      "centroid": [
+        150,
+        540
+      ],
+      "biblicalReferences": [
+        "Juízes 14"
+      ],
+      "historicalPeriodId": "united_monarchy_stylized",
+      "description": "Uma das cinco cidades filisteias."
+    },
+    {
+      "id": "asdode",
+      "name": "Asdode",
+      "regionId": "filistia",
+      "neighbors": [
+        "ascalom",
+        "gate"
+      ],
+      "polygon": [
+        [
+          150,
+          465
+        ],
+        [
+          230,
+          465
+        ],
+        [
+          230,
+          535
+        ],
+        [
+          150,
+          535
+        ]
+      ],
+      "centroid": [
+        190,
+        500
+      ],
+      "biblicalReferences": [
+        "1 Samuel 5"
+      ],
+      "historicalPeriodId": "united_monarchy_stylized",
+      "description": "Cidade onde a Arca foi levada pelos filisteus."
+    },
+    {
+      "id": "gate",
+      "name": "Gate",
+      "regionId": "filistia",
+      "neighbors": [
+        "hebrom",
+        "belem",
+        "asdode"
+      ],
+      "polygon": [
+        [
+          220,
+          485
+        ],
+        [
+          300,
+          485
+        ],
+        [
+          300,
+          555
+        ],
+        [
+          220,
+          555
+        ]
+      ],
+      "centroid": [
+        260,
+        520
+      ],
+      "biblicalReferences": [
+        "1 Samuel 17"
+      ],
+      "historicalPeriodId": "united_monarchy_stylized",
+      "description": "Cidade natal de Goliate."
+    },
+    {
+      "id": "tiro",
+      "name": "Tiro",
+      "regionId": "fenicia",
+      "neighbors": [
+        "siquem",
+        "sidom"
+      ],
+      "polygon": [
+        [
+          260,
+          45
+        ],
+        [
+          340,
+          45
+        ],
+        [
+          340,
+          115
+        ],
+        [
+          260,
+          115
+        ]
+      ],
+      "centroid": [
+        300,
+        80
+      ],
+      "biblicalReferences": [
+        "1 Reis 5"
+      ],
+      "historicalPeriodId": "united_monarchy_stylized",
+      "description": "Porto fenício famoso por seus mercadores."
+    },
+    {
+      "id": "sidom",
+      "name": "Sidom",
+      "regionId": "fenicia",
+      "neighbors": [
+        "tiro",
+        "damasco"
+      ],
+      "polygon": [
+        [
+          340,
+          105
+        ],
+        [
+          420,
+          105
+        ],
+        [
+          420,
+          175
+        ],
+        [
+          340,
+          175
+        ]
+      ],
+      "centroid": [
+        380,
+        140
+      ],
+      "biblicalReferences": [
+        "Juízes 10"
+      ],
+      "historicalPeriodId": "united_monarchy_stylized",
+      "description": "Antiga cidade fenícia ao norte de Canaã."
+    },
+    {
+      "id": "damasco",
+      "name": "Damasco",
+      "regionId": "transjordania",
+      "neighbors": [
+        "siquem",
+        "sidom",
+        "moabe"
+      ],
+      "polygon": [
+        [
+          520,
+          145
+        ],
+        [
+          600,
+          145
+        ],
+        [
+          600,
+          215
+        ],
+        [
+          520,
+          215
+        ]
+      ],
+      "centroid": [
+        560,
+        180
+      ],
+      "biblicalReferences": [
+        "Atos 9"
+      ],
+      "historicalPeriodId": "united_monarchy_stylized",
+      "description": "Cidade da conversão de Paulo."
+    },
+    {
+      "id": "moabe",
+      "name": "Moabe",
+      "regionId": "transjordania",
+      "neighbors": [
+        "damasco",
+        "amom",
+        "edom"
+      ],
+      "polygon": [
+        [
+          520,
+          425
+        ],
+        [
+          600,
+          425
+        ],
+        [
+          600,
+          495
+        ],
+        [
+          520,
+          495
+        ]
+      ],
+      "centroid": [
+        560,
+        460
+      ],
+      "biblicalReferences": [
+        "Rute 1"
+      ],
+      "historicalPeriodId": "united_monarchy_stylized",
+      "description": "Território a leste do Mar Morto."
+    },
+    {
+      "id": "edom",
+      "name": "Edom",
+      "regionId": "transjordania",
+      "neighbors": [
+        "hebrom",
+        "gaza",
+        "moabe"
+      ],
+      "polygon": [
+        [
+          440,
+          565
+        ],
+        [
+          520,
+          565
+        ],
+        [
+          520,
+          635
+        ],
+        [
+          440,
+          635
+        ]
+      ],
+      "centroid": [
+        480,
+        600
+      ],
+      "biblicalReferences": [
+        "Gênesis 36"
+      ],
+      "historicalPeriodId": "united_monarchy_stylized",
+      "description": "Território associado a Esaú."
+    },
+    {
+      "id": "amom",
+      "name": "Amom",
+      "regionId": "transjordania",
+      "neighbors": [
+        "jerusalem",
+        "jerico",
+        "moabe"
+      ],
+      "polygon": [
+        [
+          520,
+          345
+        ],
+        [
+          600,
+          345
+        ],
+        [
+          600,
+          415
+        ],
+        [
+          520,
+          415
+        ]
+      ],
+      "centroid": [
+        560,
+        380
+      ],
+      "biblicalReferences": [
+        "Juízes 11"
+      ],
+      "historicalPeriodId": "united_monarchy_stylized",
+      "description": "Território a leste do Jordão."
+    }
+  ]
+}
