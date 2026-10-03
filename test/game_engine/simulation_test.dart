@@ -7,6 +7,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:reinos/game_engine/domain/bot_difficulty.dart';
 import 'package:reinos/game_engine/domain/game_map.dart';
 import 'package:reinos/game_engine/domain/player_color.dart';
 import 'package:reinos/game_engine/domain/rules_config.dart';
@@ -71,7 +72,11 @@ class _MatchSimulation {
       case GamePhase.initialPlacement:
         if (state.pendingReinforcements > 0) {
           final placement = BotStrategy.decideReinforcementPlacement(
-              state, playerId, state.pendingReinforcements);
+            state,
+            playerId,
+            state.pendingReinforcements,
+            difficulty: state.currentPlayer.botDifficulty,
+          );
           if (placement.isEmpty) {
             _endPhase(playerId);
           } else if (state.phase == GamePhase.initialPlacement) {
@@ -105,7 +110,11 @@ class _MatchSimulation {
         return;
 
       case GamePhase.attack:
-        final decision = BotStrategy.decideNextAttack(state, playerId);
+        final decision = BotStrategy.decideNextAttack(
+          state,
+          playerId,
+          difficulty: state.currentPlayer.botDifficulty,
+        );
         if (decision == null) {
           _endPhase(playerId);
         } else {
@@ -161,6 +170,10 @@ void main() {
                 displayName: 'Bot $i',
                 color: PlayerColor.values[i],
                 isBot: true,
+                // Cycle every difficulty so the simulation exercises all of
+                // BotStrategy's difficulty-dependent branches, not just the
+                // (unspecified-difficulty) default.
+                botDifficulty: BotDifficulty.values[i % BotDifficulty.values.length],
               ),
           ];
           final initial =

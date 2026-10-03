@@ -124,6 +124,29 @@
   2 testes de widget (conteúdo, dismiss por toque).
 - Suite completa: **135/135 testes passando**, analyzer limpo.
 
+## Fase 3 — Objetivos completos + Bot avançado
+
+- [x] `ObjectiveEngine` implementa os 5 tipos da seção 18: `eliminatePlayer` (alvo concreto
+  atribuído na criação, nunca "qualquer rival") e `hybrid` (todas as sub-condições, avaliadas
+  recursivamente). `GameEngine.newMatch` distribui os 5 tipos ciclicamente entre os jogadores.
+- [x] `PlayerConfig`/`Player` carregam `BotDifficulty`; `SetupScreen` deixa escolher a
+  dificuldade dos bots.
+- [x] `BotStrategy` fica de fato mais forte com a dificuldade, sem nunca tocar no RNG: limiar de
+  vantagem numérica para atacar (fácil aceita desvantagem, normal/difícil/especialista cada vez
+  mais exigentes); difícil/especialista evitam deixar o território de origem exposto a outros
+  vizinhos inimigos (mas nunca recusam o único ataque legal disponível — ver bug abaixo);
+  reforços priorizam a fronteira mais ameaçada (mais vizinhos inimigos) em vez de só a mais fraca.
+- [x] 16 testes novos (9 de objetivos + 7 de bot/dificuldade), incluindo um teste explícito que
+  prova que nenhuma função do bot nunca altera `SeededRandom.state`.
+- **Soft-lock real encontrado e corrigido pela própria simulação de 90 partidas:** a primeira
+  versão do limiar "especialista" (margem ≥ 3) combinada com a verificação de risco fazia bots
+  especialistas nunca atacarem em alguns tabuleiros equilibrados, travando a partida para sempre
+  (nunca chegava a `gameOver` dentro do limite de ações do teste). Corrigido alinhando o limiar
+  especialista ao de difícil (ambos ≥ 2, diferenciados pela avaliação de risco e priorização de
+  reforço) e garantindo que a avaliação de risco **nunca** recuse o único ataque legal disponível
+  — prefere seguro quando há opção, mas sempre age quando não há.
+- Suite completa: **151/151 testes passando**, analyzer limpo, build web compilando.
+
 ## Fora desta fase (ver ROADMAP.md)
 - [ ] Cartas de evento (Reconstrução, Sabedoria, Tempo de Fartura)
 - [ ] Biblical Knowledge layer, Codex, Timeline, challenges

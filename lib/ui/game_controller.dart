@@ -189,7 +189,8 @@ class GameController extends StateNotifier<GameState?> {
         return;
 
       case GamePhase.attack:
-        final decision = BotStrategy.decideNextAttack(s, playerId);
+        final decision =
+            BotStrategy.decideNextAttack(s, playerId, difficulty: s.currentPlayer.botDifficulty);
         if (decision == null) {
           _dispatchEndPhase();
         } else {
@@ -208,8 +209,12 @@ class GameController extends StateNotifier<GameState?> {
 
   void _stepReinforcement(GameState s, String playerId) {
     if (s.pendingReinforcements > 0) {
-      final placement =
-          BotStrategy.decideReinforcementPlacement(s, playerId, s.pendingReinforcements);
+      final placement = BotStrategy.decideReinforcementPlacement(
+        s,
+        playerId,
+        s.pendingReinforcements,
+        difficulty: s.currentPlayer.botDifficulty,
+      );
       if (placement.isEmpty) {
         _dispatchEndPhase();
       } else if (s.phase == GamePhase.initialPlacement) {

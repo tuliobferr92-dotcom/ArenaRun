@@ -1,13 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../game_engine/domain/bot_difficulty.dart';
 import '../../game_engine/domain/player_color.dart';
 import '../../game_engine/engine/game_engine.dart';
 import '../design_system/tokens.dart';
 import '../game_controller.dart';
 import 'game_screen.dart';
 
-/// Minimal setup flow for Phase 1: pick player count, rest are bots.
+String _difficultyLabel(BotDifficulty difficulty) {
+  switch (difficulty) {
+    case BotDifficulty.easy:
+      return 'Fácil';
+    case BotDifficulty.normal:
+      return 'Normal';
+    case BotDifficulty.hard:
+      return 'Difícil';
+    case BotDifficulty.expert:
+      return 'Especialista';
+  }
+}
+
+/// Minimal setup flow for Phase 1/3: pick player count and bot difficulty,
+/// rest are bots.
 class SetupScreen extends ConsumerStatefulWidget {
   const SetupScreen({super.key});
 
@@ -17,6 +32,7 @@ class SetupScreen extends ConsumerStatefulWidget {
 
 class _SetupScreenState extends ConsumerState<SetupScreen> {
   int _playerCount = 2;
+  BotDifficulty _botDifficulty = BotDifficulty.normal;
   bool _starting = false;
 
   Future<void> _startMatch() async {
@@ -30,7 +46,13 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
     final configs = [
       PlayerConfig(id: 'p0', displayName: 'Você', color: colors[0]),
       for (var i = 1; i < _playerCount; i++)
-        PlayerConfig(id: 'p$i', displayName: 'Bot $i', color: colors[i], isBot: true),
+        PlayerConfig(
+          id: 'p$i',
+          displayName: 'Bot $i',
+          color: colors[i],
+          isBot: true,
+          botDifficulty: _botDifficulty,
+        ),
     ];
     await ref.read(gameControllerProvider.notifier).startMatch(
           mapId: 'biblical_lands_v1',
@@ -63,8 +85,21 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
               label: '$_playerCount',
               onChanged: (v) => setState(() => _playerCount = v.round()),
             ),
+            const SizedBox(height: ReinosSpacing.md),
+            Text('Dificuldade dos bots', style: ReinosTypography.body),
+            Wrap(
+              spacing: ReinosSpacing.sm,
+              children: BotDifficulty.values.map((difficulty) {
+                return ChoiceChip(
+                  label: Text(_difficultyLabel(difficulty)),
+                  selected: _botDifficulty == difficulty,
+                  onSelected: (_) => setState(() => _botDifficulty = difficulty),
+                );
+              }).toList(),
+            ),
+            const SizedBox(height: ReinosSpacing.sm),
             Text(
-              'Você + ${_playerCount - 1} bot(s). Dificuldade de bots: Normal.',
+              'Você + ${_playerCount - 1} bot(s).',
               style: ReinosTypography.label,
             ),
             const Spacer(),

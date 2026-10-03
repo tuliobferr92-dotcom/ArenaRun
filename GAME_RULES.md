@@ -57,11 +57,17 @@ O jogador distribui os reforços entre territórios próprios antes de avançar 
 - Jogador sem territórios é eliminado; suas cartas voltam ao fundo do deck.
 - Vitória por: objetivo secreto completo, OU único jogador restante no mapa (fallback de dominação total).
 
-## Objetivos secretos (Fase 1)
+## Objetivos secretos
+Todos os 5 tipos da seção 18 estão implementados:
 - `controlTerritoryCount(n)`: controlar N territórios simultaneamente.
 - `controlRegions([ids])`: controlar todas as regiões listadas por completo.
-- Extensões futuras (`controlSpecificTerritories`, `eliminatePlayer`, `hybrid`) já modeladas na engine,
-  ativadas em fases posteriores.
+- `controlSpecificTerritories([ids])`: controlar uma lista explícita de territórios.
+- `eliminatePlayer(targetPlayerId)`: eliminar um rival específico (sempre atribuído com um id
+  concreto na criação da partida — nunca fica "em aberto"; eliminar qualquer rival não conta).
+- `hybrid({conditions: [...]})`: **todas** as sub-condições devem valer simultaneamente — cada
+  `condition` é `{type, params}` no mesmo formato de um objetivo normal, avaliada recursivamente.
+- `GameEngine.newMatch` distribui os 5 tipos ciclicamente entre os jogadores para garantir
+  variedade a cada partida.
 
 ## Domínio Regional (seção 17)
 - O bônus de reforço por controlar uma região inteira (`Region.controlBonus`) já é recalculado
@@ -75,6 +81,16 @@ O jogador distribui os reforços entre territórios próprios antes de avançar 
   controlada por um único jogador (recalculado ao vivo a partir da posse atual — sobrevive a
   save/load sem precisar de estado extra).
 
-## Bot (Fase 1)
-Avalia, em ordem: progresso do próprio objetivo → fronteiras fracas do inimigo mais vulnerável →
-ataque com vantagem numérica mínima configurável. O bot nunca influencia o RNG dos dados.
+## Bot e dificuldade (seção 38)
+- O bot nunca influencia o RNG dos dados — `BotStrategy` só decide **qual** ação pedir;
+  `BattleEngine` sempre resolve os dados a partir do mesmo `SeededRandom` compartilhado.
+- `BotDifficulty` (fácil/normal/difícil/especialista) muda a **qualidade da decisão**, nunca a sorte:
+  - Vantagem numérica mínima para atacar: fácil aceita até desvantagem (-2), normal exige +1,
+    difícil/especialista exigem +2.
+  - Difícil/especialista evitam deixar o território de origem exposto a outros vizinhos inimigos
+    depois do ataque (mede o "risco" comparando a guarnição restante com a soma das tropas
+    inimigas vizinhas) — mas nunca recusam atacar para sempre: se o único ataque elegível for
+    arriscado, atacam mesmo assim, para nunca travar a partida.
+  - Reforços: fácil/normal reforçam a fronteira com menos tropas; difícil/especialista priorizam
+    a fronteira com mais vizinhos inimigos (mais ameaçada), mesmo que tenha mais tropas.
+  - O bot troca cartas territoriais automaticamente assim que tiver uma combinação válida.

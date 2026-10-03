@@ -1,3 +1,4 @@
+import '../domain/bot_difficulty.dart';
 import '../domain/game_map.dart';
 import '../domain/objective.dart';
 import '../domain/player.dart';
@@ -19,12 +20,14 @@ class PlayerConfig {
   final String displayName;
   final PlayerColor color;
   final bool isBot;
+  final BotDifficulty? botDifficulty;
 
   const PlayerConfig({
     required this.id,
     required this.displayName,
     required this.color,
     this.isBot = false,
+    this.botDifficulty,
   });
 }
 
@@ -46,27 +49,14 @@ class GameEngine {
     final players = <Player>[];
     for (var i = 0; i < configs.length; i++) {
       final config = configs[i];
-      final objective = i.isEven
-          ? Objective(
-              id: 'obj_count_$i',
-              type: ObjectiveType.controlTerritoryCount,
-              description:
-                  'Controle ${rules.minTerritoriesForObjective} territórios simultaneamente.',
-              params: {'count': rules.minTerritoriesForObjective},
-            )
-          : Objective(
-              id: 'obj_regions_$i',
-              type: ObjectiveType.controlRegions,
-              description: 'Controle totalmente duas regiões do mapa.',
-              params: {
-                'regionIds': map.regions.keys.take(2).toList(),
-              },
-            );
+      final rivalId = configs[(i + 1) % configs.length].id;
+      final objective = _assignObjective(i, map, rules, rivalId);
       players.add(Player(
         id: config.id,
         displayName: config.displayName,
         color: config.color,
         isBot: config.isBot,
+        botDifficulty: config.botDifficulty,
         objective: objective,
       ));
     }
@@ -97,6 +87,66 @@ class GameEngine {
       rules: rules,
       pendingReinforcements: rules.initialPlacementExtraArmies,
     );
+  }
+
+  /// Cycles through all 5 `ObjectiveType`s (section 18) so every match
+  /// exercises the full variety, not just the two simplest ones.
+  static Objective _assignObjective(
+    int playerIndex,
+    GameMap map,
+    RulesConfig rules,
+    String rivalId,
+  ) {
+    switch (playerIndex % 5) {
+      case 0:
+        return Objective(
+          id: 'obj_count_$playerIndex',
+          type: ObjectiveType.controlTerritoryCount,
+          description:
+              'Controle ${rules.minTerritoriesForObjective} territórios simultaneamente.',
+          params: {'count': rules.minTerritoriesForObjective},
+        );
+      case 1:
+        return Objective(
+          id: 'obj_regions_$playerIndex',
+          type: ObjectiveType.controlRegions,
+          description: 'Controle totalmente duas regiões do mapa.',
+          params: {'regionIds': map.regions.keys.take(2).toList()},
+        );
+      case 2:
+        final targets = map.territories.keys.take(5).toList();
+        return Objective(
+          id: 'obj_specific_$playerIndex',
+          type: ObjectiveType.controlSpecificTerritories,
+          description: 'Controle ${targets.length} territórios específicos.',
+          params: {'territoryIds': targets},
+        );
+      case 3:
+        return Objective(
+          id: 'obj_eliminate_$playerIndex',
+          type: ObjectiveType.eliminatePlayer,
+          description: 'Elimine um rival específico do jogo.',
+          params: {'targetPlayerId': rivalId},
+        );
+      default:
+        return Objective(
+          id: 'obj_hybrid_$playerIndex',
+          type: ObjectiveType.hybrid,
+          description: 'Controle uma região inteira E um número mínimo de territórios.',
+          params: {
+            'conditions': [
+              {
+                'type': ObjectiveType.controlRegions.name,
+                'params': {'regionIds': map.regions.keys.take(1).toList()},
+              },
+              {
+                'type': ObjectiveType.controlTerritoryCount.name,
+                'params': {'count': (rules.minTerritoriesForObjective * 0.6).round()},
+              },
+            ],
+          },
+        );
+    }
   }
 
   /// One card per territory, symbols cycled evenly, plus two wildcards
