@@ -87,9 +87,33 @@
   com `ownerId` já atribuído antes do bug existir).
 - Suite completa: **116/116 testes passando**, `flutter analyze` limpo.
 
+## Fase 2 (parcial) — Cartas territoriais + Animações de batalha
+
+- [x] `CardRarity` (cosmético) + baralho com 2 coringas; `RulesConfig.cardTradeInSequence`
+  (recompensa escalável, compartilhada entre jogadores) carregado de `default_rules.json`.
+- [x] `PlayCardAction` no `GameEngine`: só na fase de Reforços, exatamente 3 cartas, valida
+  trinca/conjunto com coringas preenchendo lacunas, aplica recompensa a `pendingReinforcements`.
+- [x] UI: botão de cartas no HUD (badge com contagem), `CardHandSheet` para selecionar e trocar,
+  erro do engine mostrado como snackbar em vez de falhar silenciosamente.
+- [x] Bot troca cartas automaticamente (`BotStrategy.decideCardTradeIn`) — exercido pelos 90
+  jogos simulados em `simulation_test.dart`, que continuam todos passando.
+- [x] 8 testes de engine cobrindo combos válidos/inválidos, coringa, fase errada, nº errado de
+  cartas e escalonamento de recompensa através de múltiplas trocas.
+- [x] `BattleSequenceOverlay` (seção 15): ícone de dados girando → revelação dos dados →
+  comparação par a par com cor (verde/vermelho) → resumo de perdas → faixa de conquista; haptics
+  (`HapticFeedback`) e hooks de som (`AudioService`/`NoOpAudioService`, sem assets reais ainda).
+  A engine nunca espera a animação — o resultado já está definitivo em `GameState` antes dela
+  começar a tocar.
+- [x] Pulso dourado no próprio mapa sobre o território recém-conquistado, após a overlay fechar.
+- [x] 6 testes de widget cobrindo as fases da sequência, banner de conquista condicional, botão
+  "Pular" e ordem dos eventos de som — com cuidado explícito para nunca deixar um `Timer`
+  pendente (usar `Timer` cancelável em vez de uma cadeia de `Future.delayed`).
+- Suite completa: **130/130 testes passando**, `flutter analyze` limpo, `flutter build web`
+  compilando.
+
 ## Fora desta fase (ver ROADMAP.md)
-- [ ] Cartas de evento completas, troca de cartas territoriais
-- [ ] Animações de batalha completas, domínio regional visual
+- [ ] Cartas de evento (Reconstrução, Sabedoria, Tempo de Fartura)
+- [ ] Domínio regional visual (seção 17), destaque de fronteiras durante o ataque
 - [ ] Biblical Knowledge layer, Codex, Timeline, challenges
 - [ ] Pass-and-play (ocultar informação privada ao trocar de jogador no mesmo aparelho)
-- [ ] Multiplayer real, áudio, haptics, acessibilidade, localização
+- [ ] Multiplayer real, áudio real (assets), acessibilidade, localização

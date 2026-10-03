@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../animations/battle_sequence_overlay.dart';
+import '../../game_engine/domain/player.dart';
 import '../../game_engine/domain/territory.dart';
+import '../../game_engine/state/battle_state.dart';
 import '../../game_engine/state/game_phase.dart';
 import '../../game_engine/state/game_state.dart';
 import '../design_system/tokens.dart';
 import '../game_controller.dart';
+import '../widgets/card_hand_sheet.dart';
 import '../widgets/debug_panel.dart';
 import '../widgets/hud.dart';
 import '../widgets/map_view.dart';
@@ -18,8 +22,67 @@ class GameScreen extends ConsumerStatefulWidget {
   ConsumerState<GameScreen> createState() => _GameScreenState();
 }
 
-class _GameScreenState extends ConsumerState<GameScreen> {
+class _GameScreenState extends ConsumerState<GameScreen>
+    with SingleTickerProviderStateMixin {
   String? _selectedOwnId;
+
+  late final AnimationController _pulseController = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 600),
+  )..addListener(() => setState(() {}));
+  String? _pulsingTerritoryId;
+
+  @override
+  void dispose() {
+    _pulseController.dispose();
+    super.dispose();
+  }
+
+  /// Brief glowing ring around a just-conquered territory (section 15/17)
+  /// — a lightweight, map-level echo of the conquest the overlay already
+  /// announced, so the board itself visibly reacts to ownership changing.
+  Future<void> _triggerConquestPulse(String territoryId) async {
+    setState(() => _pulsingTerritoryId = territoryId);
+    for (var i = 0; i < 2 && mounted; i++) {
+      await _pulseController.forward(from: 0);
+    }
+    if (mounted) setState(() => _pulsingTerritoryId = null);
+  }
+
+  Player _playerById(GameState state, String id) =>
+      state.players.firstWhere((p) => p.id == id);
+
+  Color _playerColor(GameState state, String playerId) {
+    final index = state.players.indexWhere((p) => p.id == playerId);
+    return ReinosColors.playerColors[index % ReinosColors.playerColors.length];
+  }
+
+  void _showBattleOverlay(GameState afterState, BattleState battle) {
+    final roll = battle.rolls.last;
+    final conquered = roll.territoryConquered;
+    final territoryName = afterState.territories[battle.toTerritoryId]!.name;
+
+    showGeneralDialog(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: Colors.transparent,
+      transitionDuration: Duration.zero,
+      pageBuilder: (dialogContext, _, _) => BattleSequenceOverlay(
+        attackerName: _playerById(afterState, battle.attackerId).displayName,
+        defenderName: _playerById(afterState, battle.defenderId).displayName,
+        attackerColor: _playerColor(afterState, battle.attackerId),
+        defenderColor: _playerColor(afterState, battle.defenderId),
+        roll: roll,
+        conquered: conquered,
+        territoryName: territoryName,
+        audio: ref.read(audioServiceProvider),
+        onDismiss: () {
+          Navigator.of(dialogContext).pop();
+          if (conquered) _triggerConquestPulse(battle.toTerritoryId);
+        },
+      ),
+    );
+  }
 
   void _handleTap(GameState state, String tappedId) {
     final currentPlayerId = state.currentPlayer.id;
@@ -103,8 +166,15 @@ class _GameScreenState extends ConsumerState<GameScreen> {
             ),
             FilledButton(
               onPressed: () {
-                ref.read(gameControllerProvider.notifier).attack(from.id, to.id, troopCount);
+                final controller = ref.read(gameControllerProvider.notifier);
+                controller.attack(from.id, to.id, troopCount);
                 Navigator.of(dialogContext).pop();
+
+                final afterState = ref.read(gameControllerProvider);
+                final battle = afterState?.activeBattle;
+                if (controller.lastError == null && battle != null) {
+                  _showBattleOverlay(afterState!, battle);
+                }
               },
               child: const Text('ATACAR'),
             ),
@@ -165,6 +235,27 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     );
   }
 
+  void _showHand(GameState state) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: ReinosColors.surface,
+      isScrollControlled: true,
+      builder: (sheetContext) => CardHandSheet(
+        cards: state.currentPlayer.cards,
+        onTradeIn: (cardIds) {
+          final controller = ref.read(gameControllerProvider.notifier);
+          controller.playCards(cardIds);
+          final error = controller.lastError;
+          if (error != null) {
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error)));
+          } else {
+            Navigator.of(sheetContext).pop();
+          }
+        },
+      ),
+    );
+  }
+
   void _showObjective(GameState state) {
     showDialog(
       context: context,
@@ -209,6 +300,8 @@ class _GameScreenState extends ConsumerState<GameScreen> {
               state: state,
               selectedTerritoryId: _selectedOwnId,
               onTerritoryTap: (id) => _handleTap(state, id),
+              pulsingTerritoryId: _pulsingTerritoryId,
+              pulseValue: _pulseController.value,
             ),
           ),
           Align(
@@ -219,6 +312,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
               onEndPhase: () => ref.read(gameControllerProvider.notifier).endPhase(),
               onShowObjective: () => _showObjective(state),
               onSaveAndExit: _saveAndExit,
+              onShowHand: () => _showHand(state),
             ),
           ),
           if (selected != null)

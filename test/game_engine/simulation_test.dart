@@ -50,8 +50,25 @@ class _MatchSimulation {
   void _step() {
     final playerId = state.currentPlayer.id;
     switch (state.phase) {
-      case GamePhase.initialPlacement:
       case GamePhase.reinforcement:
+        final tradeIn = BotStrategy.decideCardTradeIn(state, playerId);
+        if (tradeIn != null) {
+          state = GameEngine.apply(
+            state,
+            _withSeq((seq) => PlayCardAction(
+                  gameId: state.gameId,
+                  playerId: playerId,
+                  timestamp: DateTime.now(),
+                  sequenceNumber: seq,
+                  cardIds: tradeIn,
+                )),
+          );
+          return;
+        }
+        continue reinforcementPlacement;
+
+      reinforcementPlacement:
+      case GamePhase.initialPlacement:
         if (state.pendingReinforcements > 0) {
           final placement = BotStrategy.decideReinforcementPlacement(
               state, playerId, state.pendingReinforcements);

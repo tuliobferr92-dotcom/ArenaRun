@@ -12,7 +12,18 @@ class MapPainter extends CustomPainter {
   final GameState state;
   final String? selectedTerritoryId;
 
-  MapPainter({required this.state, required this.selectedTerritoryId});
+  /// A territory that just changed hands, pulsing briefly as "special
+  /// conquest" feedback (section 15/17), plus how far into that pulse
+  /// animation (0..1, one full glow cycle) the current frame is.
+  final String? pulsingTerritoryId;
+  final double pulseValue;
+
+  MapPainter({
+    required this.state,
+    required this.selectedTerritoryId,
+    this.pulsingTerritoryId,
+    this.pulseValue = 0,
+  });
 
   static const double mapWidth = 1000;
   static const double mapHeight = 700;
@@ -53,6 +64,17 @@ class MapPainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeWidth = territory.id == selectedTerritoryId ? 3 : 1.2;
     canvas.drawPath(path, borderPaint);
+
+    if (territory.id == pulsingTerritoryId) {
+      final glowOpacity = (1 - (pulseValue - 0.5).abs() * 2).clamp(0.0, 1.0);
+      canvas.drawPath(
+        path,
+        Paint()
+          ..color = ReinosColors.gold.withValues(alpha: 0.9 * glowOpacity)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 6,
+      );
+    }
 
     final center = _scale(size, territory.centroid.dx, territory.centroid.dy);
 
@@ -127,6 +149,8 @@ class MapPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant MapPainter oldDelegate) {
     return oldDelegate.state != state ||
-        oldDelegate.selectedTerritoryId != selectedTerritoryId;
+        oldDelegate.selectedTerritoryId != selectedTerritoryId ||
+        oldDelegate.pulsingTerritoryId != pulsingTerritoryId ||
+        oldDelegate.pulseValue != pulseValue;
   }
 }

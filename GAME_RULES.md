@@ -35,10 +35,23 @@ O jogador distribui os reforços entre territórios próprios antes de avançar 
 
 ### Fase 4 — Finalização (`CARD_REWARD` / `TURN_END`)
 - Se o jogador conquistou **ao menos um território** neste turno, recebe 1 `TerritoryCard` do topo do deck.
-- Trocas de combinações de cartas (3 símbolos iguais ou 1 de cada) concedem reforços conforme
-  `cardTradeInValues`, aplicáveis no início do próprio turno de reforços.
 - Checagem de condição de vitória (`ObjectiveEngine.isComplete`) e de eliminação.
 - Passa a vez ao próximo jogador vivo.
+
+## Cartas territoriais e troca de combinações
+- O baralho tem 1 carta por território (símbolo `shield`/`flame`/`scroll`, cíclico) + 2 cartas
+  coringa (`wildcard`). Raridade (`common`/`rare`/`legendary`) é puramente cosmética — nunca altera
+  o valor da troca.
+- Trocas só podem acontecer **na fase de Reforços**, antes ou depois de distribuir os reforços
+  recebidos por território (seção 19/20 do briefing).
+- Uma troca sempre envolve **exatamente 3 cartas**. É válida se os símbolos não-coringa entre as 3
+  forem **todos iguais** (trinca) ou **todos diferentes** (conjunto); coringas preenchem a lacuna
+  para qualquer um dos dois casos. Duas iguais + uma diferente, sem coringa, é a única combinação
+  invál­ida.
+- A recompensa escala a cada troca **da partida inteira** (não por jogador), via
+  `RulesConfig.cardTradeInSequence` (padrão: 4, 6, 8, 10, 12, 15) e, a partir daí,
+  `cardTradeInIncrementAfterSequence` (padrão: +5) por troca adicional — nada hardcoded no engine.
+- O bot troca automaticamente qualquer combinação válida que tiver em mãos, assim que possível.
 
 ## Eliminação e vitória
 - Jogador sem territórios é eliminado; suas cartas voltam ao fundo do deck.

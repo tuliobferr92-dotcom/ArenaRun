@@ -40,6 +40,7 @@ class GameHud extends StatelessWidget {
   final VoidCallback onEndPhase;
   final VoidCallback onShowObjective;
   final VoidCallback onSaveAndExit;
+  final VoidCallback onShowHand;
   final bool canEndPhase;
 
   const GameHud({
@@ -48,6 +49,7 @@ class GameHud extends StatelessWidget {
     required this.onEndPhase,
     required this.onShowObjective,
     required this.onSaveAndExit,
+    required this.onShowHand,
     required this.canEndPhase,
   });
 
@@ -84,6 +86,15 @@ class GameHud extends StatelessWidget {
               onPressed: onShowObjective,
               icon: const Icon(Icons.auto_stories, color: ReinosColors.gold),
               tooltip: 'Objetivo secreto',
+            ),
+            Badge(
+              label: Text('${player.cards.length}'),
+              isLabelVisible: player.cards.isNotEmpty,
+              child: IconButton(
+                onPressed: onShowHand,
+                icon: const Icon(Icons.style, color: ReinosColors.parchment),
+                tooltip: 'Suas cartas',
+              ),
             ),
             FilledButton(
               onPressed: canEndPhase ? onEndPhase : null,

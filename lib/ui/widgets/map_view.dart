@@ -9,12 +9,16 @@ class MapView extends StatefulWidget {
   final GameState state;
   final String? selectedTerritoryId;
   final ValueChanged<String> onTerritoryTap;
+  final String? pulsingTerritoryId;
+  final double pulseValue;
 
   const MapView({
     super.key,
     required this.state,
     required this.selectedTerritoryId,
     required this.onTerritoryTap,
+    this.pulsingTerritoryId,
+    this.pulseValue = 0,
   });
 
   @override
@@ -48,6 +52,8 @@ class _MapViewState extends State<MapView> {
             painter: MapPainter(
               state: widget.state,
               selectedTerritoryId: widget.selectedTerritoryId,
+              pulsingTerritoryId: widget.pulsingTerritoryId,
+              pulseValue: widget.pulseValue,
             ),
           ),
         ),

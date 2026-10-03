@@ -1,4 +1,5 @@
 import '../domain/territory.dart';
+import '../domain/territory_card.dart';
 import '../state/game_state.dart';
 
 class BotAttackDecision {
@@ -76,5 +77,34 @@ class BotStrategy {
       toTerritoryId: bestTo.id,
       troopCount: troopCount,
     );
+  }
+
+  /// Returns 3 card ids forming a valid trade-in combo from the player's
+  /// hand, or null if none exists yet. The bot always trades in as soon as
+  /// it can — holding cards has no strategic upside in this ruleset, and
+  /// never claiming a valid combo would make full-match simulations
+  /// (test/game_engine/simulation_test.dart) under-exercise the card loop.
+  static List<String>? decideCardTradeIn(GameState state, String playerId) {
+    final hand = state.players.firstWhere((p) => p.id == playerId).cards;
+    if (hand.length < 3) return null;
+
+    for (var i = 0; i < hand.length; i++) {
+      for (var j = i + 1; j < hand.length; j++) {
+        for (var k = j + 1; k < hand.length; k++) {
+          final trio = [hand[i], hand[j], hand[k]];
+          if (_isValidCombo(trio)) {
+            return trio.map((c) => c.id).toList();
+          }
+        }
+      }
+    }
+    return null;
+  }
+
+  static bool _isValidCombo(List<TerritoryCard> cards) {
+    final nonWild = cards.map((c) => c.symbol).where((s) => s != CardSymbol.wildcard).toList();
+    if (nonWild.length <= 2) return true;
+    final distinct = nonWild.toSet().length;
+    return distinct == 1 || distinct == nonWild.length;
   }
 }

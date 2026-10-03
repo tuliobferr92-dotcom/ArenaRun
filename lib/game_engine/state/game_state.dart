@@ -41,6 +41,11 @@ class GameState {
   final RulesConfig rules;
   final String? winnerId;
 
+  /// How many card trade-ins have happened so far this match (shared
+  /// across all players) — indexes `RulesConfig.cardTradeInReward` so the
+  /// reward escalates (GAME_RULES.md "Fase 4").
+  final int cardTradeInsCompleted;
+
   const GameState({
     required this.gameId,
     required this.mapId,
@@ -59,6 +64,7 @@ class GameState {
     this.conqueredTerritoryThisTurn = false,
     this.actionHistory = const [],
     this.winnerId,
+    this.cardTradeInsCompleted = 0,
   });
 
   Player get currentPlayer => players[currentPlayerIndex];
@@ -85,6 +91,7 @@ class GameState {
         'rngState': rng.state,
         'rules': rules.toJson(),
         'winnerId': winnerId,
+        'cardTradeInsCompleted': cardTradeInsCompleted,
       };
 
   factory GameState.fromJson(Map<String, dynamic> json) {
@@ -120,6 +127,7 @@ class GameState {
       pendingReinforcements: json['pendingReinforcements'] as int,
       conqueredTerritoryThisTurn: json['conqueredTerritoryThisTurn'] as bool,
       winnerId: json['winnerId'] as String?,
+      cardTradeInsCompleted: json['cardTradeInsCompleted'] as int? ?? 0,
     );
   }
 
@@ -146,6 +154,7 @@ class GameState {
     bool? conqueredTerritoryThisTurn,
     List<GameAction>? actionHistory,
     String? winnerId,
+    int? cardTradeInsCompleted,
   }) {
     return GameState(
       gameId: gameId,
@@ -166,6 +175,7 @@ class GameState {
           conqueredTerritoryThisTurn ?? this.conqueredTerritoryThisTurn,
       actionHistory: actionHistory ?? this.actionHistory,
       winnerId: winnerId ?? this.winnerId,
+      cardTradeInsCompleted: cardTradeInsCompleted ?? this.cardTradeInsCompleted,
     );
   }
 }

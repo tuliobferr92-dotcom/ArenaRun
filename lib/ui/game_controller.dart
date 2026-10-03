@@ -9,6 +9,7 @@ import '../game_engine/engine/game_exceptions.dart';
 import '../game_engine/state/game_action.dart';
 import '../game_engine/state/game_phase.dart';
 import '../game_engine/state/game_state.dart';
+import '../services/audio_service.dart';
 import '../services/save_game_service.dart';
 
 final contentRepositoryProvider = Provider<ContentRepository>((ref) {
@@ -17,6 +18,10 @@ final contentRepositoryProvider = Provider<ContentRepository>((ref) {
 
 final saveGameServiceProvider = Provider<SaveGameService>((ref) {
   return FileSaveGameService();
+});
+
+final audioServiceProvider = Provider<AudioService>((ref) {
+  return NoOpAudioService();
 });
 
 final gameControllerProvider =
@@ -127,6 +132,17 @@ class GameController extends StateNotifier<GameState?> {
     _runBotLoopIfNeeded();
   }
 
+  void playCards(List<String> cardIds) {
+    _dispatch((gameId, seq) => PlayCardAction(
+          gameId: gameId,
+          playerId: state!.currentPlayer.id,
+          timestamp: DateTime.now(),
+          sequenceNumber: seq,
+          cardIds: cardIds,
+        ));
+    _runBotLoopIfNeeded();
+  }
+
   void endPhase() {
     _dispatch((gameId, seq) => EndPhaseAction(
           gameId: gameId,
@@ -159,22 +175,17 @@ class GameController extends StateNotifier<GameState?> {
   void _stepBot(GameState s) {
     final playerId = s.currentPlayer.id;
     switch (s.phase) {
-      case GamePhase.initialPlacement:
       case GamePhase.reinforcement:
-        if (s.pendingReinforcements > 0) {
-          final placement =
-              BotStrategy.decideReinforcementPlacement(s, playerId, s.pendingReinforcements);
-          if (placement.isEmpty) {
-            _dispatchEndPhase();
-          } else if (s.phase == GamePhase.initialPlacement) {
-            final entry = placement.entries.first;
-            _dispatchPlaceArmy(entry.key, entry.value);
-          } else {
-            _dispatchReinforce(placement);
-          }
-        } else {
-          _dispatchEndPhase();
+        final tradeIn = BotStrategy.decideCardTradeIn(s, playerId);
+        if (tradeIn != null) {
+          _dispatchPlayCards(tradeIn);
+          return;
         }
+        _stepReinforcement(s, playerId);
+        return;
+
+      case GamePhase.initialPlacement:
+        _stepReinforcement(s, playerId);
         return;
 
       case GamePhase.attack:
@@ -193,6 +204,33 @@ class GameController extends StateNotifier<GameState?> {
       default:
         return;
     }
+  }
+
+  void _stepReinforcement(GameState s, String playerId) {
+    if (s.pendingReinforcements > 0) {
+      final placement =
+          BotStrategy.decideReinforcementPlacement(s, playerId, s.pendingReinforcements);
+      if (placement.isEmpty) {
+        _dispatchEndPhase();
+      } else if (s.phase == GamePhase.initialPlacement) {
+        final entry = placement.entries.first;
+        _dispatchPlaceArmy(entry.key, entry.value);
+      } else {
+        _dispatchReinforce(placement);
+      }
+    } else {
+      _dispatchEndPhase();
+    }
+  }
+
+  void _dispatchPlayCards(List<String> cardIds) {
+    _dispatch((gameId, seq) => PlayCardAction(
+          gameId: gameId,
+          playerId: state!.currentPlayer.id,
+          timestamp: DateTime.now(),
+          sequenceNumber: seq,
+          cardIds: cardIds,
+        ));
   }
 
   void _dispatchPlaceArmy(String territoryId, int count) {

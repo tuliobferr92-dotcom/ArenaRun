@@ -99,6 +99,11 @@ class GameEngine {
     );
   }
 
+  /// One card per territory, symbols cycled evenly, plus two wildcards
+  /// (territoryId left empty — a wildcard represents no specific place).
+  /// Rarity is purely cosmetic (never gates the trade-in reward) and is
+  /// assigned with a simple weighted roll: ~70% common, ~25% rare, ~5%
+  /// legendary.
   static List<TerritoryCard> _buildDeck(GameMap map, SeededRandom rng) {
     final symbols = CardSymbol.values.where((s) => s != CardSymbol.wildcard).toList();
     final ids = map.territories.keys.toList();
@@ -108,9 +113,25 @@ class GameEngine {
         id: 'card_${ids[i]}',
         territoryId: ids[i],
         symbol: symbols[i % symbols.length],
+        rarity: _rollRarity(rng),
+      ));
+    }
+    for (var i = 0; i < 2; i++) {
+      cards.add(TerritoryCard(
+        id: 'card_wildcard_$i',
+        territoryId: '',
+        symbol: CardSymbol.wildcard,
+        rarity: CardRarity.legendary,
       ));
     }
     return rng.shuffled(cards);
+  }
+
+  static CardRarity _rollRarity(SeededRandom rng) {
+    final roll = rng.nextInt(100);
+    if (roll < 70) return CardRarity.common;
+    if (roll < 95) return CardRarity.rare;
+    return CardRarity.legendary;
   }
 
   /// Applies [action] to [state], returning a brand new [GameState].
@@ -279,6 +300,7 @@ class GameEngine {
       territories: territories,
       activeBattle: BattleState(
         attackerId: action.playerId,
+        defenderId: to.ownerId!,
         fromTerritoryId: from.id,
         toTerritoryId: to.id,
         rolls: [roll],
@@ -336,19 +358,51 @@ class GameEngine {
   // ---------------------------------------------------------------------
 
   static GameState _playCard(GameState state, PlayCardAction action) {
-    // Card trade-in mechanics land in Phase 2 (ROADMAP.md). Validate shape
-    // now so the action type is already exercised by tests/UI.
+    if (state.phase != GamePhase.reinforcement) {
+      throw const InvalidActionException(
+          'Só é possível trocar cartas no início da fase de reforços.');
+    }
+    if (action.cardIds.length != 3) {
+      throw const InvalidActionException('Troque exatamente 3 cartas por vez.');
+    }
+
     final player = state.currentPlayer;
-    final owned = player.cards.map((c) => c.id).toSet();
-    if (!action.cardIds.every(owned.contains)) {
+    final owned = {for (final c in player.cards) c.id: c};
+    if (!action.cardIds.every(owned.containsKey)) {
       throw const InvalidActionException('Jogador não possui essas cartas.');
     }
+
+    final chosen = action.cardIds.map((id) => owned[id]!).toList();
+    if (!_isValidCardCombo(chosen)) {
+      throw const InvalidActionException(
+          'Combinação de cartas inválida (use 3 iguais ou 3 símbolos diferentes).');
+    }
+
     final remainingCards = player.cards.where((c) => !action.cardIds.contains(c.id)).toList();
-    final discarded = player.cards.where((c) => action.cardIds.contains(c.id)).toList();
     final players = state.players
         .map((p) => p.id == player.id ? p.copyWith(cards: remainingCards) : p)
         .toList();
-    return state.copyWith(players: players, discardPile: [...state.discardPile, ...discarded]);
+
+    final reward = state.rules.cardTradeInReward(state.cardTradeInsCompleted);
+
+    return state.copyWith(
+      players: players,
+      discardPile: [...state.discardPile, ...chosen],
+      pendingReinforcements: state.pendingReinforcements + reward,
+      cardTradeInsCompleted: state.cardTradeInsCompleted + 1,
+    );
+  }
+
+  /// A combo is valid iff the non-wildcard symbols among the 3 chosen
+  /// cards are either all the same (a triple) or all distinct (a set) —
+  /// wildcards fill in for whichever symbol is missing. Two-of-a-kind plus
+  /// one different non-wild symbol is the only invalid shape (GAME_RULES.md
+  /// "Cartas territoriais").
+  static bool _isValidCardCombo(List<TerritoryCard> cards) {
+    final nonWild = cards.map((c) => c.symbol).where((s) => s != CardSymbol.wildcard).toList();
+    if (nonWild.length <= 2) return true;
+    final distinct = nonWild.toSet().length;
+    return distinct == 1 || distinct == nonWild.length;
   }
 
   // ---------------------------------------------------------------------

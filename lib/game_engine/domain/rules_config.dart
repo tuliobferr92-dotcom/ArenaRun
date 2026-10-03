@@ -10,6 +10,13 @@ class RulesConfig {
   final int initialPlacementExtraArmies;
   final int minTerritoriesForObjective;
 
+  /// Reinforcements granted for the 1st, 2nd, 3rd, ... card trade-in of the
+  /// match (shared across all players, as in GAME_RULES.md "Fase 4"). Once
+  /// exhausted, [cardTradeInIncrementAfterSequence] is added for each
+  /// further trade-in instead of indexing past the list.
+  final List<int> cardTradeInSequence;
+  final int cardTradeInIncrementAfterSequence;
+
   const RulesConfig({
     required this.minReinforcements,
     required this.territoriesPerReinforcement,
@@ -18,7 +25,17 @@ class RulesConfig {
     required this.startingArmiesPerTerritory,
     required this.initialPlacementExtraArmies,
     required this.minTerritoriesForObjective,
+    this.cardTradeInSequence = const [4, 6, 8, 10, 12, 15],
+    this.cardTradeInIncrementAfterSequence = 5,
   });
+
+  int cardTradeInReward(int tradeInsCompletedBefore) {
+    if (tradeInsCompletedBefore < cardTradeInSequence.length) {
+      return cardTradeInSequence[tradeInsCompletedBefore];
+    }
+    final stepsPastSequence = tradeInsCompletedBefore - cardTradeInSequence.length + 1;
+    return cardTradeInSequence.last + stepsPastSequence * cardTradeInIncrementAfterSequence;
+  }
 
   factory RulesConfig.fromJson(Map<String, dynamic> json) {
     return RulesConfig(
@@ -29,6 +46,11 @@ class RulesConfig {
       startingArmiesPerTerritory: json['startingArmiesPerTerritory'] as int,
       initialPlacementExtraArmies: json['initialPlacementExtraArmies'] as int,
       minTerritoriesForObjective: json['minTerritoriesForObjective'] as int? ?? 18,
+      cardTradeInSequence: json['cardTradeInSequence'] != null
+          ? (json['cardTradeInSequence'] as List).cast<int>()
+          : const [4, 6, 8, 10, 12, 15],
+      cardTradeInIncrementAfterSequence:
+          json['cardTradeInIncrementAfterSequence'] as int? ?? 5,
     );
   }
 
@@ -40,6 +62,8 @@ class RulesConfig {
         'startingArmiesPerTerritory': startingArmiesPerTerritory,
         'initialPlacementExtraArmies': initialPlacementExtraArmies,
         'minTerritoriesForObjective': minTerritoriesForObjective,
+        'cardTradeInSequence': cardTradeInSequence,
+        'cardTradeInIncrementAfterSequence': cardTradeInIncrementAfterSequence,
       };
 
   static const RulesConfig defaults = RulesConfig(
