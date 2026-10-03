@@ -88,6 +88,25 @@ class PlayCardAction extends GameAction {
   });
 }
 
+/// Records that a player answered a Bible challenge (section 22/31). The
+/// engine never judges the answer itself — whether [correct] is true is
+/// decided by `BibleChallengeEngine.isCorrect` in the content layer before
+/// this action is dispatched, keeping `game_engine` free of any
+/// dependency on biblical content.
+class AnswerChallengeAction extends GameAction {
+  final String challengeId;
+  final bool correct;
+
+  const AnswerChallengeAction({
+    required super.gameId,
+    required super.playerId,
+    required super.timestamp,
+    required super.sequenceNumber,
+    required this.challengeId,
+    required this.correct,
+  });
+}
+
 class EndPhaseAction extends GameAction {
   const EndPhaseAction({
     required super.gameId,

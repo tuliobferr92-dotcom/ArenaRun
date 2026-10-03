@@ -196,6 +196,7 @@ class GameEngine {
       AttackAction a => _attack(state, a),
       MoveArmyAction a => _moveArmy(state, a),
       PlayCardAction a => _playCard(state, a),
+      AnswerChallengeAction a => _answerChallenge(state, a),
       EndPhaseAction a => _endPhase(state, a),
       _ => throw InvalidActionException('Ação desconhecida: ${action.runtimeType}'),
     };
@@ -357,6 +358,7 @@ class GameEngine {
       ),
       conqueredTerritoryThisTurn: state.conqueredTerritoryThisTurn || conquered,
       clearNewlyDominatedRegion: true,
+      clearNewlyDiscoveredTerritory: true,
     );
 
     if (conquered) {
@@ -364,6 +366,12 @@ class GameEngine {
       final newlyDominated = _findNewlyDominatedRegion(state, next, action.playerId);
       if (newlyDominated != null) {
         next = next.copyWith(newlyDominatedRegionId: newlyDominated);
+      }
+      if (!state.discoveredTerritoryIds.contains(to.id)) {
+        next = next.copyWith(
+          discoveredTerritoryIds: {...next.discoveredTerritoryIds, to.id},
+          newlyDiscoveredTerritoryId: to.id,
+        );
       }
     }
 
@@ -423,6 +431,31 @@ class GameEngine {
     territories[to.id] = to.copyWith(armyCount: to.armyCount + action.count);
 
     return state.copyWith(phase: GamePhase.fortification, territories: territories);
+  }
+
+  // ---------------------------------------------------------------------
+  // BIBLE CHALLENGES (section 22/31) — the engine only records that a
+  // challenge was answered and whether it was correct; judging the answer
+  // itself happens in the content layer (`BibleChallengeEngine`), which
+  // `game_engine` never depends on.
+  // ---------------------------------------------------------------------
+
+  static GameState _answerChallenge(GameState state, AnswerChallengeAction action) {
+    final player = state.currentPlayer;
+    if (player.answeredChallengeIds.contains(action.challengeId)) {
+      throw const InvalidActionException('Este desafio já foi respondido.');
+    }
+
+    final players = state.players.map((p) {
+      if (p.id != player.id) return p;
+      return p.copyWith(
+        answeredChallengeIds: {...p.answeredChallengeIds, action.challengeId},
+        correctChallengeAnswers:
+            p.correctChallengeAnswers + (action.correct ? 1 : 0),
+      );
+    }).toList();
+
+    return state.copyWith(players: players);
   }
 
   // ---------------------------------------------------------------------
@@ -494,6 +527,7 @@ class GameEngine {
           phase: GamePhase.fortification,
           clearActiveBattle: true,
           clearNewlyDominatedRegion: true,
+          clearNewlyDiscoveredTerritory: true,
         );
 
       case GamePhase.fortification:

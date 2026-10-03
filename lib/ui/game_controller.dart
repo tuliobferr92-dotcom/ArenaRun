@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../content/content_repository.dart';
+import '../content/domain/bible_challenge.dart';
 import '../game_engine/domain/game_map.dart';
 import '../game_engine/engine/bot_strategy.dart';
 import '../game_engine/engine/game_engine.dart';
@@ -22,6 +23,10 @@ final saveGameServiceProvider = Provider<SaveGameService>((ref) {
 
 final audioServiceProvider = Provider<AudioService>((ref) {
   return NoOpAudioService();
+});
+
+final bibleChallengesProvider = FutureProvider<List<BibleChallenge>>((ref) {
+  return ref.read(contentRepositoryProvider).loadBibleChallenges();
 });
 
 final gameControllerProvider =
@@ -141,6 +146,17 @@ class GameController extends StateNotifier<GameState?> {
           cardIds: cardIds,
         ));
     _runBotLoopIfNeeded();
+  }
+
+  void answerChallenge(String challengeId, bool correct) {
+    _dispatch((gameId, seq) => AnswerChallengeAction(
+          gameId: gameId,
+          playerId: state!.currentPlayer.id,
+          timestamp: DateTime.now(),
+          sequenceNumber: seq,
+          challengeId: challengeId,
+          correct: correct,
+        ));
   }
 
   void endPhase() {

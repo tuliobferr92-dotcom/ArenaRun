@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../animations/battle_sequence_overlay.dart';
+import '../../animations/discovery_banner.dart';
 import '../../animations/regional_dominance_banner.dart';
+import '../../content/engine/bible_challenge_engine.dart';
 import '../../game_engine/domain/player.dart';
 import '../../game_engine/domain/territory.dart';
 import '../../game_engine/state/battle_state.dart';
@@ -79,19 +81,33 @@ class _GameScreenState extends ConsumerState<GameScreen>
         audio: ref.read(audioServiceProvider),
         onDismiss: () {
           Navigator.of(dialogContext).pop();
-          if (conquered) {
-            _triggerConquestPulse(battle.toTerritoryId);
-            final regionId = afterState.newlyDominatedRegionId;
-            if (regionId != null) _showRegionalDominanceBanner(afterState, regionId);
-          }
+          if (conquered) _afterConquestDismissed(afterState, battle.toTerritoryId);
         },
       ),
     );
   }
 
-  void _showRegionalDominanceBanner(GameState state, String regionId) {
+  /// Chains the post-conquest beats (section 15/17/30) one at a time, in
+  /// order, so they never pile up on screen together: map pulse (fire and
+  /// forget — purely cosmetic), then the regional-dominance banner if this
+  /// conquest completed a region, then the discovery banner if this is the
+  /// territory's first-ever conquest this match.
+  Future<void> _afterConquestDismissed(GameState afterState, String territoryId) async {
+    _triggerConquestPulse(territoryId);
+
+    final regionId = afterState.newlyDominatedRegionId;
+    if (regionId != null) {
+      await _showRegionalDominanceBanner(afterState, regionId);
+    }
+
+    if (afterState.newlyDiscoveredTerritoryId == territoryId) {
+      await _showDiscoveryBanner(afterState, territoryId);
+    }
+  }
+
+  Future<void> _showRegionalDominanceBanner(GameState state, String regionId) {
     final region = state.regions[regionId]!;
-    showGeneralDialog(
+    return showGeneralDialog(
       context: context,
       barrierDismissible: false,
       barrierColor: Colors.transparent,
@@ -99,6 +115,32 @@ class _GameScreenState extends ConsumerState<GameScreen>
       pageBuilder: (dialogContext, _, _) => RegionalDominanceBanner(
         regionName: region.name,
         reinforcementBonus: region.controlBonus,
+        onDismiss: () => Navigator.of(dialogContext).pop(),
+      ),
+    );
+  }
+
+  Future<void> _showDiscoveryBanner(GameState state, String territoryId) async {
+    final territory = state.territories[territoryId]!;
+    final challenges = await ref.read(bibleChallengesProvider.future);
+    final challenge = BibleChallengeEngine.nextChallengeForTerritory(
+      challenges,
+      territoryId,
+      state.currentPlayer.answeredChallengeIds,
+    );
+    if (!mounted) return;
+
+    return showGeneralDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: Colors.transparent,
+      transitionDuration: Duration.zero,
+      pageBuilder: (dialogContext, _, _) => DiscoveryBanner(
+        territoryName: territory.name,
+        biblicalReferences: territory.biblicalReferences,
+        challenge: challenge,
+        onAnswered: (challengeId, correct) =>
+            ref.read(gameControllerProvider.notifier).answerChallenge(challengeId, correct),
         onDismiss: () => Navigator.of(dialogContext).pop(),
       ),
     );
@@ -411,25 +453,90 @@ class _GameOverView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final winner = state.players.firstWhere((p) => p.id == state.winnerId);
+    // "Sua Jornada" (section 31) is written from the human player's point
+    // of view — the setup flow always seats the human as the first,
+    // non-bot player.
+    final human = state.players.firstWhere((p) => !p.isBot, orElse: () => state.players.first);
+    final discoveredNames =
+        state.discoveredTerritoryIds.map((id) => state.territories[id]!.name).toList()..sort();
+
     return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text('FIM DE JOGO', style: ReinosTypography.title),
-            const SizedBox(height: ReinosSpacing.md),
-            Text('${winner.displayName} venceu!', style: ReinosTypography.heading),
-            const SizedBox(height: ReinosSpacing.lg),
-            FilledButton(
-              onPressed: () => Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(builder: (_) => const HomeScreen()),
-                (route) => false,
-              ),
-              child: const Text('VOLTAR AO INÍCIO'),
+      body: SingleChildScrollView(
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(ReinosSpacing.lg),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text('FIM DE JOGO', style: ReinosTypography.title),
+                const SizedBox(height: ReinosSpacing.md),
+                Text('${winner.displayName} venceu!', style: ReinosTypography.heading),
+                const SizedBox(height: ReinosSpacing.xl),
+                Text('📜 SUA JORNADA', style: ReinosTypography.heading),
+                const SizedBox(height: ReinosSpacing.sm),
+                Wrap(
+                  alignment: WrapAlignment.center,
+                  spacing: ReinosSpacing.lg,
+                  runSpacing: ReinosSpacing.sm,
+                  children: [
+                    _JourneyStat(label: 'Turnos', value: '${state.turnNumber}'),
+                    _JourneyStat(
+                      label: 'Territórios descobertos',
+                      value: '${state.discoveredTerritoryIds.length}',
+                    ),
+                    _JourneyStat(
+                      label: 'Desafios respondidos',
+                      value:
+                          '${human.correctChallengeAnswers}/${human.answeredChallengeIds.length} corretos',
+                    ),
+                  ],
+                ),
+                if (discoveredNames.isNotEmpty) ...[
+                  const SizedBox(height: ReinosSpacing.lg),
+                  Text('VOCÊ DESCOBRIU', style: ReinosTypography.label),
+                  const SizedBox(height: ReinosSpacing.sm),
+                  Wrap(
+                    alignment: WrapAlignment.center,
+                    spacing: ReinosSpacing.sm,
+                    runSpacing: ReinosSpacing.sm,
+                    children: discoveredNames
+                        .map((name) => Chip(
+                              label: Text(name),
+                              backgroundColor: ReinosColors.surface,
+                            ))
+                        .toList(),
+                  ),
+                ],
+                const SizedBox(height: ReinosSpacing.xl),
+                FilledButton(
+                  onPressed: () => Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(builder: (_) => const HomeScreen()),
+                    (route) => false,
+                  ),
+                  child: const Text('VOLTAR AO INÍCIO'),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
+    );
+  }
+}
+
+class _JourneyStat extends StatelessWidget {
+  final String label;
+  final String value;
+
+  const _JourneyStat({required this.label, required this.value});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Text(value, style: ReinosTypography.heading),
+        Text(label, style: ReinosTypography.label),
+      ],
     );
   }
 }

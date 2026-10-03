@@ -81,6 +81,21 @@ Todos os 5 tipos da seção 18 estão implementados:
   controlada por um único jogador (recalculado ao vivo a partir da posse atual — sobrevive a
   save/load sem precisar de estado extra).
 
+## Descoberta de territórios e desafios bíblicos (seções 22/24/30/31)
+- Descoberta é de partida inteira, não por jogador: `GameState.discoveredTerritoryIds` registra
+  todo território já conquistado alguma vez nesta partida. A primeira conquista de um território
+  marca `newlyDiscoveredTerritoryId` por uma única transição (mesmo padrão transiente de
+  `activeBattle`/`newlyDominatedRegionId`) — nunca re-dispara para o mesmo território.
+- **Nunca uma pergunta por ataque.** O desafio bíblico só é oferecido no momento de descoberta, e
+  é sempre opcional: "CONTINUAR JOGANDO" (padrão, sem fricção) ou "VER AGORA" (abre uma pergunta de
+  múltipla escolha). Nenhuma ação de jogo depende da resposta.
+- `AnswerChallengeAction` só registra que o jogador respondeu (certo ou errado) — o próprio
+  `GameEngine` nunca julga a resposta; `BibleChallengeEngine.isCorrect` (camada de conteúdo) decide
+  isso antes da ação ser despachada, mantendo `game_engine` livre de qualquer dependência de
+  conteúdo bíblico.
+- Cada jogador tem `answeredChallengeIds`/`correctChallengeAnswers`, usados na tela "Sua Jornada"
+  pós-partida (territórios descobertos, desafios respondidos corretamente).
+
 ## Bot e dificuldade (seção 38)
 - O bot nunca influencia o RNG dos dados — `BotStrategy` só decide **qual** ação pedir;
   `BattleEngine` sempre resolve os dados a partir do mesmo `SeededRandom` compartilhado.

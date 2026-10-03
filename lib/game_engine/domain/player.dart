@@ -15,6 +15,12 @@ class Player {
   final int xp;
   final bool isEliminated;
 
+  /// Bible challenges this player has already answered this match (right
+  /// or wrong — never asked twice) and how many of those were correct
+  /// (section 31/32 "Sua Jornada" / Biblical Knowledge).
+  final Set<String> answeredChallengeIds;
+  final int correctChallengeAnswers;
+
   const Player({
     required this.id,
     required this.displayName,
@@ -26,6 +32,8 @@ class Player {
     this.wisdomPoints = 0,
     this.xp = 0,
     this.isEliminated = false,
+    this.answeredChallengeIds = const {},
+    this.correctChallengeAnswers = 0,
   });
 
   Map<String, dynamic> toJson() => {
@@ -39,6 +47,8 @@ class Player {
         'wisdomPoints': wisdomPoints,
         'xp': xp,
         'isEliminated': isEliminated,
+        'answeredChallengeIds': answeredChallengeIds.toList(),
+        'correctChallengeAnswers': correctChallengeAnswers,
       };
 
   factory Player.fromJson(Map<String, dynamic> json) {
@@ -57,6 +67,9 @@ class Player {
       wisdomPoints: json['wisdomPoints'] as int,
       xp: json['xp'] as int,
       isEliminated: json['isEliminated'] as bool,
+      answeredChallengeIds:
+          (json['answeredChallengeIds'] as List? ?? []).cast<String>().toSet(),
+      correctChallengeAnswers: json['correctChallengeAnswers'] as int? ?? 0,
     );
   }
 
@@ -65,6 +78,8 @@ class Player {
     int? wisdomPoints,
     int? xp,
     bool? isEliminated,
+    Set<String>? answeredChallengeIds,
+    int? correctChallengeAnswers,
   }) {
     return Player(
       id: id,
@@ -77,6 +92,8 @@ class Player {
       wisdomPoints: wisdomPoints ?? this.wisdomPoints,
       xp: xp ?? this.xp,
       isEliminated: isEliminated ?? this.isEliminated,
+      answeredChallengeIds: answeredChallengeIds ?? this.answeredChallengeIds,
+      correctChallengeAnswers: correctChallengeAnswers ?? this.correctChallengeAnswers,
     );
   }
 }

@@ -147,8 +147,32 @@
   — prefere seguro quando há opção, mas sempre age quando não há.
 - Suite completa: **151/151 testes passando**, analyzer limpo, build web compilando.
 
+## Fase 4 (parcial) — Camada de Conhecimento Bíblico
+
+- [x] `BibleChallenge` (pergunta de múltipla escolha) + `ContentReviewStatus`
+  (`generated`/`reviewed`/`published`) — `ContentRepository` só entrega itens `published`.
+- [x] Primeiro lote real em `data/content/bible_challenges.json`: 18 perguntas cobrindo 16
+  territórios, cada uma reusando uma referência já existente no mapa (nenhum fato novo
+  inventado). Marcado honestamente como pendente de revisão humana
+  (`sourceMetadata.humanReviewed: false`) — ver `BIBLE_CONTENT_GUIDELINES.md`.
+- [x] `BibleChallengeEngine` (seleção pura: próximo desafio não respondido para um território).
+- [x] `GameState.discoveredTerritoryIds` (partida inteira) + `newlyDiscoveredTerritoryId`
+  (transiente, mesmo padrão de `newlyDominatedRegionId`), marcado pelo `GameEngine` na primeira
+  conquista de cada território. `AnswerChallengeAction` registra a resposta sem o engine nunca
+  julgar conteúdo bíblico — isso é decidido na camada de conteúdo antes da ação ser despachada.
+- [x] UI: `DiscoveryBanner` (seção 30, "aprendizado invisível" — nunca força uma pergunta,
+  sempre "continuar jogando" vs. "ver agora") + `BibleChallengeDialog` opcional encadeados após a
+  animação de batalha e o banner de domínio regional, nessa ordem, nunca simultâneos.
+- [x] "Sua Jornada" (seção 31) na tela de fim de jogo: turnos, territórios descobertos, desafios
+  respondidos corretamente, lista dos territórios descobertos.
+- [x] 19 testes novos (10 de engine/conteúdo + 3 de validação do JSON semente + 6 de widget).
+- Suite completa: **170/170 testes passando**, analyzer limpo, build web compilando.
+
 ## Fora desta fase (ver ROADMAP.md)
 - [ ] Cartas de evento (Reconstrução, Sabedoria, Tempo de Fartura)
-- [ ] Biblical Knowledge layer, Codex, Timeline, challenges
+- [ ] Codex/Enciclopédia completo, Timeline visual, Biblical Knowledge Score por categoria,
+  spaced repetition (seções 25/28/32/33) — a base de dados e o pipeline editorial já existem;
+  falta a UI de navegação e o cálculo de progresso por categoria.
+- [ ] Revisão editorial humana real do lote de conteúdo bíblico (ver nota acima)
 - [ ] Pass-and-play (ocultar informação privada ao trocar de jogador no mesmo aparelho)
 - [ ] Multiplayer real, áudio real (assets), acessibilidade, localização

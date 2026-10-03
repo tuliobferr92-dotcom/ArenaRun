@@ -1,0 +1,366 @@
+[
+  {
+    "id": "chal_jerusalem_1",
+    "territoryId": "jerusalem",
+    "question": "Qual rei tornou Jerusalém a capital de Israel?",
+    "options": ["Davi", "Saul", "Salomão", "Roboão"],
+    "correctOptionIndex": 0,
+    "explanation": "2 Samuel 5 narra Davi conquistando Jerusalém dos jebuseus e estabelecendo-a como sua capital.",
+    "biblicalReferences": ["2 Samuel 5"],
+    "category": "characters",
+    "difficulty": "beginner",
+    "reviewStatus": "published",
+    "sourceMetadata": {
+      "author": "reinos-content-seed",
+      "generatedBy": "ai-draft",
+      "humanReviewed": false,
+      "note": "Conteúdo de exemplo para validar o pipeline; necessita revisão editorial humana antes de uso em produção."
+    }
+  },
+  {
+    "id": "chal_jerico_1",
+    "territoryId": "jerico",
+    "question": "Segundo Josué 6, o que aconteceu com os muros de Jericó?",
+    "options": [
+      "Caíram depois que os israelitas contornaram a cidade e tocaram trombetas",
+      "Foram derrubados por um terremoto registrado no texto",
+      "A cidade nunca teve muralhas",
+      "Foram incendiados por Josué sozinho, à noite"
+    ],
+    "correctOptionIndex": 0,
+    "explanation": "Josué 6 descreve o povo contornando Jericó por sete dias; no sétimo dia, ao toque das trombetas e ao grito do povo, os muros caíram.",
+    "biblicalReferences": ["Josué 6"],
+    "category": "events",
+    "difficulty": "beginner",
+    "reviewStatus": "published",
+    "sourceMetadata": {
+      "author": "reinos-content-seed",
+      "generatedBy": "ai-draft",
+      "humanReviewed": false,
+      "note": "Conteúdo de exemplo para validar o pipeline; necessita revisão editorial humana antes de uso em produção."
+    }
+  },
+  {
+    "id": "chal_hebrom_1",
+    "territoryId": "hebrom",
+    "question": "Em Gênesis 23, o que Abraão compra em Hebrom?",
+    "options": [
+      "Um campo com uma caverna para sepultar Sara",
+      "Um palácio para sua família",
+      "Um poço de água",
+      "Terras para um exército"
+    ],
+    "correctOptionIndex": 0,
+    "explanation": "Gênesis 23 relata Abraão comprando o campo de Efrom, com a caverna de Macpela, para sepultar Sara.",
+    "biblicalReferences": ["Gênesis 23"],
+    "category": "events",
+    "difficulty": "beginner",
+    "reviewStatus": "published",
+    "sourceMetadata": {
+      "author": "reinos-content-seed",
+      "generatedBy": "ai-draft",
+      "humanReviewed": false,
+      "note": "Conteúdo de exemplo para validar o pipeline; necessita revisão editorial humana antes de uso em produção."
+    }
+  },
+  {
+    "id": "chal_belem_1",
+    "territoryId": "belem",
+    "question": "Belém é citada em Miquéias 5:2 como a cidade natal de qual rei?",
+    "options": ["Davi", "Salomão", "Ezequias", "Josias"],
+    "correctOptionIndex": 0,
+    "explanation": "Miquéias 5:2 se refere a Belém em conexão com a linhagem de Davi.",
+    "biblicalReferences": ["Miquéias 5:2"],
+    "category": "characters",
+    "difficulty": "beginner",
+    "reviewStatus": "published",
+    "sourceMetadata": {
+      "author": "reinos-content-seed",
+      "generatedBy": "ai-draft",
+      "humanReviewed": false,
+      "note": "Conteúdo de exemplo para validar o pipeline; necessita revisão editorial humana antes de uso em produção."
+    }
+  },
+  {
+    "id": "chal_belem_2",
+    "territoryId": "belem",
+    "question": "O livro de Rute se passa, em parte, em qual destas cidades?",
+    "options": ["Belém", "Jericó", "Hebrom", "Siquém"],
+    "correctOptionIndex": 0,
+    "explanation": "Rute 1 narra o retorno de Noemi e Rute a Belém.",
+    "biblicalReferences": ["Rute 1"],
+    "category": "books",
+    "difficulty": "beginner",
+    "reviewStatus": "published",
+    "sourceMetadata": {
+      "author": "reinos-content-seed",
+      "generatedBy": "ai-draft",
+      "humanReviewed": false,
+      "note": "Conteúdo de exemplo para validar o pipeline; necessita revisão editorial humana antes de uso em produção."
+    }
+  },
+  {
+    "id": "chal_siquem_1",
+    "territoryId": "siquem",
+    "question": "Em Josué 24, o que acontece em Siquém?",
+    "options": [
+      "Josué renova a aliança do povo com Deus",
+      "A arca da aliança é destruída",
+      "Josué morre em batalha",
+      "Os filisteus são derrotados definitivamente"
+    ],
+    "correctOptionIndex": 0,
+    "explanation": "Josué 24 registra a renovação da aliança do povo de Israel em Siquém, pouco antes da morte de Josué.",
+    "biblicalReferences": ["Josué 24"],
+    "category": "events",
+    "difficulty": "intermediate",
+    "reviewStatus": "published",
+    "sourceMetadata": {
+      "author": "reinos-content-seed",
+      "generatedBy": "ai-draft",
+      "humanReviewed": false,
+      "note": "Conteúdo de exemplo para validar o pipeline; necessita revisão editorial humana antes de uso em produção."
+    }
+  },
+  {
+    "id": "chal_betel_1",
+    "territoryId": "betel",
+    "question": "Em Gênesis 28, o que Jacó vê em sonho em Betel?",
+    "options": [
+      "Uma escada ligando a terra ao céu",
+      "Um exército de anjos em batalha",
+      "Um rio se abrindo em duas partes",
+      "Uma cidade em chamas"
+    ],
+    "correctOptionIndex": 0,
+    "explanation": "Gênesis 28 descreve o sonho de Jacó em Betel, com uma escada entre a terra e o céu.",
+    "biblicalReferences": ["Gênesis 28"],
+    "category": "events",
+    "difficulty": "beginner",
+    "reviewStatus": "published",
+    "sourceMetadata": {
+      "author": "reinos-content-seed",
+      "generatedBy": "ai-draft",
+      "humanReviewed": false,
+      "note": "Conteúdo de exemplo para validar o pipeline; necessita revisão editorial humana antes de uso em produção."
+    }
+  },
+  {
+    "id": "chal_gaza_1",
+    "territoryId": "gaza",
+    "question": "Qual personagem bíblico é associado a Gaza em Juízes 16?",
+    "options": ["Sansão", "Gideão", "Davi", "Josué"],
+    "correctOptionIndex": 0,
+    "explanation": "Juízes 16 narra episódios da vida de Sansão em Gaza, incluindo sua prisão pelos filisteus.",
+    "biblicalReferences": ["Juízes 16"],
+    "category": "characters",
+    "difficulty": "beginner",
+    "reviewStatus": "published",
+    "sourceMetadata": {
+      "author": "reinos-content-seed",
+      "generatedBy": "ai-draft",
+      "humanReviewed": false,
+      "note": "Conteúdo de exemplo para validar o pipeline; necessita revisão editorial humana antes de uso em produção."
+    }
+  },
+  {
+    "id": "chal_ascalom_1",
+    "territoryId": "ascalom",
+    "question": "Segundo Juízes 14, o que Sansão faz em Ascalom?",
+    "options": [
+      "Derrota trinta homens para cumprir uma aposta de seu casamento",
+      "Constrói um templo pagão",
+      "Faz um tratado de paz com os filisteus",
+      "Perde sua força sobrenatural"
+    ],
+    "correctOptionIndex": 0,
+    "explanation": "Juízes 14:19 relata Sansão descendo a Ascalom e derrotando trinta homens para pagar uma aposta feita em seu casamento.",
+    "biblicalReferences": ["Juízes 14"],
+    "category": "events",
+    "difficulty": "intermediate",
+    "reviewStatus": "published",
+    "sourceMetadata": {
+      "author": "reinos-content-seed",
+      "generatedBy": "ai-draft",
+      "humanReviewed": false,
+      "note": "Conteúdo de exemplo para validar o pipeline; necessita revisão editorial humana antes de uso em produção."
+    }
+  },
+  {
+    "id": "chal_asdode_1",
+    "territoryId": "asdode",
+    "question": "Em 1 Samuel 5, o que acontece com a estátua do deus Dagom em Asdode?",
+    "options": [
+      "Ela cai diante da Arca da Aliança",
+      "Ela é destruída por um incêndio",
+      "Ela é levada para Jerusalém",
+      "Ela nunca é mencionada no texto"
+    ],
+    "correctOptionIndex": 0,
+    "explanation": "1 Samuel 5 narra a Arca da Aliança sendo levada a Asdode e a estátua de Dagom caindo diante dela.",
+    "biblicalReferences": ["1 Samuel 5"],
+    "category": "events",
+    "difficulty": "intermediate",
+    "reviewStatus": "published",
+    "sourceMetadata": {
+      "author": "reinos-content-seed",
+      "generatedBy": "ai-draft",
+      "humanReviewed": false,
+      "note": "Conteúdo de exemplo para validar o pipeline; necessita revisão editorial humana antes de uso em produção."
+    }
+  },
+  {
+    "id": "chal_gate_1",
+    "territoryId": "gate",
+    "question": "Goliate, o guerreiro filisteu derrotado por Davi, era natural de qual cidade?",
+    "options": ["Gate", "Gaza", "Asdode", "Ascalom"],
+    "correctOptionIndex": 0,
+    "explanation": "1 Samuel 17 identifica Goliate como natural de Gate.",
+    "biblicalReferences": ["1 Samuel 17"],
+    "category": "characters",
+    "difficulty": "beginner",
+    "reviewStatus": "published",
+    "sourceMetadata": {
+      "author": "reinos-content-seed",
+      "generatedBy": "ai-draft",
+      "humanReviewed": false,
+      "note": "Conteúdo de exemplo para validar o pipeline; necessita revisão editorial humana antes de uso em produção."
+    }
+  },
+  {
+    "id": "chal_tiro_1",
+    "territoryId": "tiro",
+    "question": "Em 1 Reis 5, o rei de Tiro que ajuda Salomão a construir o templo se chama?",
+    "options": ["Hirão", "Acabe", "Nabucodonosor", "Ciro"],
+    "correctOptionIndex": 0,
+    "explanation": "1 Reis 5 narra a colaboração entre Hirão, rei de Tiro, e Salomão para a construção do templo.",
+    "biblicalReferences": ["1 Reis 5"],
+    "category": "characters",
+    "difficulty": "intermediate",
+    "reviewStatus": "published",
+    "sourceMetadata": {
+      "author": "reinos-content-seed",
+      "generatedBy": "ai-draft",
+      "humanReviewed": false,
+      "note": "Conteúdo de exemplo para validar o pipeline; necessita revisão editorial humana antes de uso em produção."
+    }
+  },
+  {
+    "id": "chal_sidom_1",
+    "territoryId": "sidom",
+    "question": "Em Juízes 10, Sidom é citada como origem de quê?",
+    "options": [
+      "Deuses estrangeiros que o povo de Israel passou a adorar",
+      "Um exército aliado de Israel",
+      "Um grupo de profetas de Deus",
+      "Uma rota de peregrinação ao templo"
+    ],
+    "correctOptionIndex": 0,
+    "explanation": "Juízes 10:6 menciona os deuses de Sidom entre os deuses estrangeiros que Israel passou a servir.",
+    "biblicalReferences": ["Juízes 10"],
+    "category": "context",
+    "difficulty": "advanced",
+    "reviewStatus": "published",
+    "sourceMetadata": {
+      "author": "reinos-content-seed",
+      "generatedBy": "ai-draft",
+      "humanReviewed": false,
+      "note": "Conteúdo de exemplo para validar o pipeline; necessita revisão editorial humana antes de uso em produção."
+    }
+  },
+  {
+    "id": "chal_damasco_1",
+    "territoryId": "damasco",
+    "question": "O que acontece com Paulo na estrada para Damasco, segundo Atos 9?",
+    "options": [
+      "Ele tem um encontro com Jesus e fica temporariamente cego",
+      "Ele é preso pelos romanos",
+      "Ele funda uma igreja",
+      "Ele encontra o apóstolo Pedro"
+    ],
+    "correctOptionIndex": 0,
+    "explanation": "Atos 9 narra a experiência de Paulo na estrada para Damasco, onde ele encontra Jesus e fica cego temporariamente.",
+    "biblicalReferences": ["Atos 9"],
+    "category": "events",
+    "difficulty": "beginner",
+    "reviewStatus": "published",
+    "sourceMetadata": {
+      "author": "reinos-content-seed",
+      "generatedBy": "ai-draft",
+      "humanReviewed": false,
+      "note": "Conteúdo de exemplo para validar o pipeline; necessita revisão editorial humana antes de uso em produção."
+    }
+  },
+  {
+    "id": "chal_damasco_2",
+    "territoryId": "damasco",
+    "question": "Qual apóstolo é associado à conversão narrada em Atos 9, na estrada para Damasco?",
+    "options": ["Paulo", "Pedro", "Tiago", "João"],
+    "correctOptionIndex": 0,
+    "explanation": "O episódio de Atos 9 é a conversão de Paulo (então chamado Saulo).",
+    "biblicalReferences": ["Atos 9"],
+    "category": "characters",
+    "difficulty": "beginner",
+    "reviewStatus": "published",
+    "sourceMetadata": {
+      "author": "reinos-content-seed",
+      "generatedBy": "ai-draft",
+      "humanReviewed": false,
+      "note": "Conteúdo de exemplo para validar o pipeline; necessita revisão editorial humana antes de uso em produção."
+    }
+  },
+  {
+    "id": "chal_moabe_1",
+    "territoryId": "moabe",
+    "question": "Rute, personagem que dá nome ao livro, era natural de qual território?",
+    "options": ["Moabe", "Edom", "Amom", "Filístia"],
+    "correctOptionIndex": 0,
+    "explanation": "Rute 1 identifica Rute como moabita.",
+    "biblicalReferences": ["Rute 1"],
+    "category": "characters",
+    "difficulty": "beginner",
+    "reviewStatus": "published",
+    "sourceMetadata": {
+      "author": "reinos-content-seed",
+      "generatedBy": "ai-draft",
+      "humanReviewed": false,
+      "note": "Conteúdo de exemplo para validar o pipeline; necessita revisão editorial humana antes de uso em produção."
+    }
+  },
+  {
+    "id": "chal_edom_1",
+    "territoryId": "edom",
+    "question": "Gênesis 36 lista a descendência de qual personagem, associado a Edom?",
+    "options": ["Esaú", "Jacó", "Isaque", "Labão"],
+    "correctOptionIndex": 0,
+    "explanation": "Gênesis 36 registra a genealogia de Esaú, associado à região de Edom.",
+    "biblicalReferences": ["Gênesis 36"],
+    "category": "characters",
+    "difficulty": "intermediate",
+    "reviewStatus": "published",
+    "sourceMetadata": {
+      "author": "reinos-content-seed",
+      "generatedBy": "ai-draft",
+      "humanReviewed": false,
+      "note": "Conteúdo de exemplo para validar o pipeline; necessita revisão editorial humana antes de uso em produção."
+    }
+  },
+  {
+    "id": "chal_amom_1",
+    "territoryId": "amom",
+    "question": "Em Juízes 11, qual juiz de Israel luta contra os amonitas?",
+    "options": ["Jefté", "Gideão", "Sansão", "Débora"],
+    "correctOptionIndex": 0,
+    "explanation": "Juízes 11 narra a liderança de Jefté no conflito contra os amonitas.",
+    "biblicalReferences": ["Juízes 11"],
+    "category": "characters",
+    "difficulty": "intermediate",
+    "reviewStatus": "published",
+    "sourceMetadata": {
+      "author": "reinos-content-seed",
+      "generatedBy": "ai-draft",
+      "humanReviewed": false,
+      "note": "Conteúdo de exemplo para validar o pipeline; necessita revisão editorial humana antes de uso em produção."
+    }
+  }
+]

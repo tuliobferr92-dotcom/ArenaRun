@@ -38,6 +38,17 @@ class GameState {
   /// by `ReinforcementCalculator` regardless of this flag.
   final String? newlyDominatedRegionId;
 
+  /// Every territory conquered at least once this match, match-wide
+  /// (section 24). Discovery is about the territory's content being
+  /// revealed, not a per-player secret, so one shared set is enough.
+  final Set<String> discoveredTerritoryIds;
+
+  /// Set for exactly one state transition — the conquest that discovered
+  /// a territory for the very first time this match. Like
+  /// [newlyDominatedRegionId], presentation-only and cleared on the next
+  /// action.
+  final String? newlyDiscoveredTerritoryId;
+
   final int pendingReinforcements;
 
   /// Whether the current player has conquered at least one territory this
@@ -69,6 +80,8 @@ class GameState {
     required this.rules,
     this.activeBattle,
     this.newlyDominatedRegionId,
+    this.discoveredTerritoryIds = const {},
+    this.newlyDiscoveredTerritoryId,
     this.pendingReinforcements = 0,
     this.conqueredTerritoryThisTurn = false,
     this.actionHistory = const [],
@@ -101,6 +114,7 @@ class GameState {
         'rules': rules.toJson(),
         'winnerId': winnerId,
         'cardTradeInsCompleted': cardTradeInsCompleted,
+        'discoveredTerritoryIds': discoveredTerritoryIds.toList(),
       };
 
   factory GameState.fromJson(Map<String, dynamic> json) {
@@ -137,6 +151,8 @@ class GameState {
       conqueredTerritoryThisTurn: json['conqueredTerritoryThisTurn'] as bool,
       winnerId: json['winnerId'] as String?,
       cardTradeInsCompleted: json['cardTradeInsCompleted'] as int? ?? 0,
+      discoveredTerritoryIds:
+          (json['discoveredTerritoryIds'] as List? ?? []).cast<String>().toSet(),
     );
   }
 
@@ -161,6 +177,9 @@ class GameState {
     bool clearActiveBattle = false,
     String? newlyDominatedRegionId,
     bool clearNewlyDominatedRegion = false,
+    Set<String>? discoveredTerritoryIds,
+    String? newlyDiscoveredTerritoryId,
+    bool clearNewlyDiscoveredTerritory = false,
     int? pendingReinforcements,
     bool? conqueredTerritoryThisTurn,
     List<GameAction>? actionHistory,
@@ -184,6 +203,10 @@ class GameState {
       newlyDominatedRegionId: clearNewlyDominatedRegion
           ? null
           : (newlyDominatedRegionId ?? this.newlyDominatedRegionId),
+      discoveredTerritoryIds: discoveredTerritoryIds ?? this.discoveredTerritoryIds,
+      newlyDiscoveredTerritoryId: clearNewlyDiscoveredTerritory
+          ? null
+          : (newlyDiscoveredTerritoryId ?? this.newlyDiscoveredTerritoryId),
       pendingReinforcements: pendingReinforcements ?? this.pendingReinforcements,
       conqueredTerritoryThisTurn:
           conqueredTerritoryThisTurn ?? this.conqueredTerritoryThisTurn,
