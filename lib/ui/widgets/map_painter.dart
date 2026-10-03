@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../game_engine/domain/territory.dart';
-import '../../game_engine/state/game_state.dart';
+import 'package:reinos_engine/game_engine/domain/territory.dart';
+import 'package:reinos_engine/game_engine/state/game_state.dart';
 import '../design_system/tokens.dart';
 
 /// Renders the map in separate layers (terrain/borders/ownership/armies) so

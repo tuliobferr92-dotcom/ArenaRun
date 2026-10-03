@@ -1,9 +1,9 @@
-import 'package:flutter_test/flutter_test.dart';
-import 'package:reinos/game_engine/domain/event_card.dart';
-import 'package:reinos/game_engine/engine/game_engine.dart';
-import 'package:reinos/game_engine/engine/game_exceptions.dart';
-import 'package:reinos/game_engine/state/game_action.dart';
-import 'package:reinos/game_engine/state/game_phase.dart';
+import 'package:test/test.dart';
+import 'package:reinos_engine/game_engine/domain/event_card.dart';
+import 'package:reinos_engine/game_engine/engine/game_engine.dart';
+import 'package:reinos_engine/game_engine/engine/game_exceptions.dart';
+import 'package:reinos_engine/game_engine/state/game_action.dart';
+import 'package:reinos_engine/game_engine/state/game_phase.dart';
 
 import 'test_fixtures.dart';
 

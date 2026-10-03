@@ -3,7 +3,7 @@ import 'dart:io';
 
 import 'package:path_provider/path_provider.dart';
 
-import '../game_engine/state/game_state.dart';
+import 'package:reinos_engine/game_engine/state/game_state.dart';
 
 /// Metadata shown in a "Continuar Partida" / save-slot list without
 /// deserializing the full match.

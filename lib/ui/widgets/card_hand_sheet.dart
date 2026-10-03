@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../game_engine/domain/territory_card.dart';
+import 'package:reinos_engine/game_engine/domain/territory_card.dart';
 import '../design_system/tokens.dart';
 
 IconData _symbolIcon(CardSymbol symbol) {

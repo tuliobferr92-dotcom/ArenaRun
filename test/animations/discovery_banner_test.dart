@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:reinos/animations/discovery_banner.dart';
-import 'package:reinos/content/domain/bible_challenge.dart';
-import 'package:reinos/content/domain/content_review_status.dart';
+import 'package:reinos_engine/content/domain/bible_challenge.dart';
+import 'package:reinos_engine/content/domain/content_review_status.dart';
 import 'package:reinos/services/audio_service.dart';
 
 BibleChallenge _challenge() => const BibleChallenge(

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../game_engine/domain/bot_difficulty.dart';
-import '../../game_engine/domain/player_color.dart';
-import '../../game_engine/engine/game_engine.dart';
+import 'package:reinos_engine/game_engine/domain/bot_difficulty.dart';
+import 'package:reinos_engine/game_engine/domain/player_color.dart';
+import 'package:reinos_engine/game_engine/engine/game_engine.dart';
 import '../design_system/tokens.dart';
 import '../game_controller.dart';
 import 'game_screen.dart';

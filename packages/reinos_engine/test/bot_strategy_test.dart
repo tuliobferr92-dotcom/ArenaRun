@@ -1,12 +1,12 @@
-import 'package:flutter_test/flutter_test.dart';
-import 'package:reinos/game_engine/domain/bot_difficulty.dart';
-import 'package:reinos/game_engine/domain/game_map.dart';
-import 'package:reinos/game_engine/domain/player_color.dart';
-import 'package:reinos/game_engine/domain/region.dart';
-import 'package:reinos/game_engine/domain/territory.dart';
-import 'package:reinos/game_engine/engine/bot_strategy.dart';
-import 'package:reinos/game_engine/engine/game_engine.dart';
-import 'package:reinos/game_engine/state/game_state.dart';
+import 'package:test/test.dart';
+import 'package:reinos_engine/game_engine/domain/bot_difficulty.dart';
+import 'package:reinos_engine/game_engine/domain/game_map.dart';
+import 'package:reinos_engine/game_engine/domain/player_color.dart';
+import 'package:reinos_engine/game_engine/domain/region.dart';
+import 'package:reinos_engine/game_engine/domain/territory.dart';
+import 'package:reinos_engine/game_engine/engine/bot_strategy.dart';
+import 'package:reinos_engine/game_engine/engine/game_engine.dart';
+import 'package:reinos_engine/game_engine/state/game_state.dart';
 
 import 'test_fixtures.dart';
 

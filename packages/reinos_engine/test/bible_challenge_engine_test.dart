@@ -1,7 +1,7 @@
-import 'package:flutter_test/flutter_test.dart';
-import 'package:reinos/content/domain/bible_challenge.dart';
-import 'package:reinos/content/domain/content_review_status.dart';
-import 'package:reinos/content/engine/bible_challenge_engine.dart';
+import 'package:test/test.dart';
+import 'package:reinos_engine/content/domain/bible_challenge.dart';
+import 'package:reinos_engine/content/domain/content_review_status.dart';
+import 'package:reinos_engine/content/engine/bible_challenge_engine.dart';
 
 BibleChallenge _challenge(String id, String territoryId, {int correctIndex = 0}) {
   return BibleChallenge(

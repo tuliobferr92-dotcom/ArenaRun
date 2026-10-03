@@ -8,9 +8,9 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:reinos/content/domain/bible_challenge.dart';
-import 'package:reinos/content/domain/content_review_status.dart';
-import 'package:reinos/game_engine/domain/game_map.dart';
+import 'package:reinos_engine/content/domain/bible_challenge.dart';
+import 'package:reinos_engine/content/domain/content_review_status.dart';
+import 'package:reinos_engine/game_engine/domain/game_map.dart';
 
 List<BibleChallenge> _loadChallenges() {
   final raw = File('data/content/bible_challenges.json').readAsStringSync();

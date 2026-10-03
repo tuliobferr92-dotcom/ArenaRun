@@ -2,14 +2,14 @@ import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../content/content_repository.dart';
-import '../content/domain/bible_challenge.dart';
-import '../game_engine/domain/game_map.dart';
-import '../game_engine/engine/bot_strategy.dart';
-import '../game_engine/engine/game_engine.dart';
-import '../game_engine/engine/game_exceptions.dart';
-import '../game_engine/state/game_action.dart';
-import '../game_engine/state/game_phase.dart';
-import '../game_engine/state/game_state.dart';
+import 'package:reinos_engine/content/domain/bible_challenge.dart';
+import 'package:reinos_engine/game_engine/domain/game_map.dart';
+import 'package:reinos_engine/game_engine/engine/bot_strategy.dart';
+import 'package:reinos_engine/game_engine/engine/game_engine.dart';
+import 'package:reinos_engine/game_engine/engine/game_exceptions.dart';
+import 'package:reinos_engine/game_engine/state/game_action.dart';
+import 'package:reinos_engine/game_engine/state/game_phase.dart';
+import 'package:reinos_engine/game_engine/state/game_state.dart';
 import '../services/audio_service.dart';
 import '../services/save_game_service.dart';
 

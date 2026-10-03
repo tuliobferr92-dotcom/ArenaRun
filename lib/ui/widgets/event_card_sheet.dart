@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../game_engine/domain/event_card.dart';
+import 'package:reinos_engine/game_engine/domain/event_card.dart';
 import '../design_system/tokens.dart';
 
 String _eventCardName(EventCardType type) {

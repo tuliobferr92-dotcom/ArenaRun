@@ -1,7 +1,7 @@
-import 'package:flutter_test/flutter_test.dart';
-import 'package:reinos/game_engine/domain/objective.dart';
-import 'package:reinos/game_engine/domain/player.dart';
-import 'package:reinos/game_engine/engine/objective_engine.dart';
+import 'package:test/test.dart';
+import 'package:reinos_engine/game_engine/domain/objective.dart';
+import 'package:reinos_engine/game_engine/domain/player.dart';
+import 'package:reinos_engine/game_engine/engine/objective_engine.dart';
 
 import 'test_fixtures.dart';
 

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../content/domain/bible_challenge.dart';
-import '../content/engine/bible_challenge_engine.dart';
+import 'package:reinos_engine/content/domain/bible_challenge.dart';
+import 'package:reinos_engine/content/engine/bible_challenge_engine.dart';
 import '../ui/design_system/tokens.dart';
 
 /// A single optional multiple-choice question (section 22). Never forced —

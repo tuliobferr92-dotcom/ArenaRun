@@ -1,0 +1,16 @@
+name: reinos_engine
+description: >
+  REINOS game rules engine and biblical content domain — pure Dart, no
+  Flutter dependency, so the same code runs unmodified on the client app
+  and on the multiplayer relay server (ARCHITECTURE.md sections 9/10).
+publish_to: 'none'
+version: 1.0.0
+
+environment:
+  sdk: ^3.13.5
+
+dependencies:
+
+dev_dependencies:
+  test: ^1.25.0
+  lints: ^5.0.0

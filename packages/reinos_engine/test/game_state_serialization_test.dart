@@ -1,6 +1,6 @@
-import 'package:flutter_test/flutter_test.dart';
-import 'package:reinos/game_engine/state/game_phase.dart';
-import 'package:reinos/game_engine/state/game_state.dart';
+import 'package:test/test.dart';
+import 'package:reinos_engine/game_engine/state/game_phase.dart';
+import 'package:reinos_engine/game_engine/state/game_state.dart';
 
 import 'test_fixtures.dart';
 

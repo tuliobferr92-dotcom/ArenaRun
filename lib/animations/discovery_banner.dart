@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../content/domain/bible_challenge.dart';
+import 'package:reinos_engine/content/domain/bible_challenge.dart';
 import '../services/audio_service.dart';
 import '../ui/design_system/tokens.dart';
 import 'bible_challenge_dialog.dart';

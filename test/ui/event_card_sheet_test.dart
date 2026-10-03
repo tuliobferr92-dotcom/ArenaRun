@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:reinos/game_engine/domain/event_card.dart';
+import 'package:reinos_engine/game_engine/domain/event_card.dart';
 import 'package:reinos/ui/widgets/event_card_sheet.dart';
 
 void main() {

@@ -1,4 +1,4 @@
-import '../../game_engine/state/game_state.dart';
+import 'package:reinos_engine/game_engine/state/game_state.dart';
 
 /// Pure gating logic for the pass-and-play interstitial (section 56),
 /// pulled out of `GameScreen` so it's testable without pumping the whole

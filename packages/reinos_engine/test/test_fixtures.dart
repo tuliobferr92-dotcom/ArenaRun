@@ -1,10 +1,10 @@
-import 'package:reinos/game_engine/domain/game_map.dart';
-import 'package:reinos/game_engine/domain/region.dart';
-import 'package:reinos/game_engine/domain/rules_config.dart';
-import 'package:reinos/game_engine/domain/territory.dart';
-import 'package:reinos/game_engine/engine/game_engine.dart';
-import 'package:reinos/game_engine/domain/player_color.dart';
-import 'package:reinos/game_engine/state/game_state.dart';
+import 'package:reinos_engine/game_engine/domain/game_map.dart';
+import 'package:reinos_engine/game_engine/domain/region.dart';
+import 'package:reinos_engine/game_engine/domain/rules_config.dart';
+import 'package:reinos_engine/game_engine/domain/territory.dart';
+import 'package:reinos_engine/game_engine/engine/game_engine.dart';
+import 'package:reinos_engine/game_engine/domain/player_color.dart';
+import 'package:reinos_engine/game_engine/state/game_state.dart';
 
 /// Small synthetic 4-territory map used by engine tests: a linear chain
 /// `t1 - t2 - t3 - t4`, split into two 2-territory regions. Kept separate

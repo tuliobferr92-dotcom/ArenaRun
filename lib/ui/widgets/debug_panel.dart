@@ -2,8 +2,8 @@ import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../game_engine/state/game_phase.dart';
-import '../../game_engine/state/game_state.dart';
+import 'package:reinos_engine/game_engine/state/game_phase.dart';
+import 'package:reinos_engine/game_engine/state/game_state.dart';
 import '../design_system/tokens.dart';
 import '../game_controller.dart';
 

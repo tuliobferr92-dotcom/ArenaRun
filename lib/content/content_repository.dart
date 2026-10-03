@@ -2,10 +2,10 @@ import 'dart:convert';
 
 import 'package:flutter/services.dart';
 
-import '../game_engine/domain/game_map.dart';
-import '../game_engine/domain/rules_config.dart';
-import 'domain/bible_challenge.dart';
-import 'domain/content_review_status.dart';
+import 'package:reinos_engine/content/domain/bible_challenge.dart';
+import 'package:reinos_engine/content/domain/content_review_status.dart';
+import 'package:reinos_engine/game_engine/domain/game_map.dart';
+import 'package:reinos_engine/game_engine/domain/rules_config.dart';
 
 /// Single point of access for everything that lives in `data/` (section 49).
 /// Nothing in `game_engine` reads assets directly — only this repository

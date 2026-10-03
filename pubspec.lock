@@ -408,6 +408,13 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.6.0"
+  reinos_engine:
+    dependency: "direct main"
+    description:
+      path: "packages/reinos_engine"
+      relative: true
+    source: path
+    version: "1.0.0"
   riverpod:
     dependency: transitive
     description:

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../game_engine/state/game_state.dart';
+import 'package:reinos_engine/game_engine/state/game_state.dart';
 import 'map_painter.dart';
 
 /// The protagonist of the screen (section 69). Wraps `MapPainter` with

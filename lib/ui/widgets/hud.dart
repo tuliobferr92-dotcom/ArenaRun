@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../../game_engine/domain/player.dart';
-import '../../game_engine/state/game_phase.dart';
-import '../../game_engine/state/game_state.dart';
+import 'package:reinos_engine/game_engine/domain/player.dart';
+import 'package:reinos_engine/game_engine/state/game_phase.dart';
+import 'package:reinos_engine/game_engine/state/game_state.dart';
 import '../design_system/tokens.dart';
 
 String phaseLabel(GamePhase phase) {

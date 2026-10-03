@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../game_engine/state/battle_state.dart';
+import 'package:reinos_engine/game_engine/state/battle_state.dart';
 import '../services/audio_service.dart';
 import '../ui/design_system/tokens.dart';
 

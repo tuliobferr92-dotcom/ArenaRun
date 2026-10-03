@@ -1,6 +1,6 @@
-import 'package:flutter_test/flutter_test.dart';
-import 'package:reinos/game_engine/engine/battle_engine.dart';
-import 'package:reinos/game_engine/rng/seeded_random.dart';
+import 'package:test/test.dart';
+import 'package:reinos_engine/game_engine/engine/battle_engine.dart';
+import 'package:reinos_engine/game_engine/rng/seeded_random.dart';
 
 import 'test_fixtures.dart';
 

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:reinos/animations/battle_sequence_overlay.dart';
-import 'package:reinos/game_engine/state/battle_state.dart';
+import 'package:reinos_engine/game_engine/state/battle_state.dart';
 import 'package:reinos/services/audio_service.dart';
 
 class _RecordingAudioService implements AudioService {

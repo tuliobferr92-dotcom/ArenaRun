@@ -7,15 +7,15 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:reinos/game_engine/domain/bot_difficulty.dart';
-import 'package:reinos/game_engine/domain/game_map.dart';
-import 'package:reinos/game_engine/domain/player_color.dart';
-import 'package:reinos/game_engine/domain/rules_config.dart';
-import 'package:reinos/game_engine/engine/bot_strategy.dart';
-import 'package:reinos/game_engine/engine/game_engine.dart';
-import 'package:reinos/game_engine/state/game_action.dart';
-import 'package:reinos/game_engine/state/game_phase.dart';
-import 'package:reinos/game_engine/state/game_state.dart';
+import 'package:reinos_engine/game_engine/domain/bot_difficulty.dart';
+import 'package:reinos_engine/game_engine/domain/game_map.dart';
+import 'package:reinos_engine/game_engine/domain/player_color.dart';
+import 'package:reinos_engine/game_engine/domain/rules_config.dart';
+import 'package:reinos_engine/game_engine/engine/bot_strategy.dart';
+import 'package:reinos_engine/game_engine/engine/game_engine.dart';
+import 'package:reinos_engine/game_engine/state/game_action.dart';
+import 'package:reinos_engine/game_engine/state/game_phase.dart';
+import 'package:reinos_engine/game_engine/state/game_state.dart';
 
 GameMap loadProductionMap() {
   final raw = File('data/maps/biblical_lands_v1.json').readAsStringSync();
