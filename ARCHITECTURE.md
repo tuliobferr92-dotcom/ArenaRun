@@ -24,25 +24,51 @@ Pacotes de terceiros usados nesta fundação (todos populares, mantidos, sem ass
 ## 2. Separação de Camadas (pastas)
 
 ```
+packages/reinos_engine/   # Pacote Dart puro (sem Flutter) — extraído nesta fase
+                           # para que o mesmo código de regras rode no app E no
+                           # servidor de multiplayer, sem duplicação.
+  lib/game_engine/        # Núcleo das regras do jogo.
+    domain/                 # Entidades: Territory, Region, GameMap, Player, Card, Objective...
+    state/                  # GameState, GamePhase (state machine), GameAction
+                             # (GameAction.toJson()/gameActionFromJson — protocolo
+                             # de rede e action log compartilham a mesma serialização)
+    engine/                  # GameEngine (reducer), ReinforcementCalculator, BattleEngine,
+                              # ObjectiveEngine, BotStrategy, RulesConfig
+    rng/                     # SeededRandom determinístico (dice rolls replayáveis)
+  lib/content/             # BibleChallenge (domínio) + BibleChallengeEngine (seleção pura)
+  test/                    # testes unitários da engine (`dart test`, sem flutter_test)
+
+server/                  # Relay WebSocket server-authoritative (multiplayer online).
+  bin/server.dart          # Entry point — lê $PORT, serve o handler WebSocket.
+  lib/room.dart            # Uma partida online: GameState autoritativo + sockets conectados.
+  lib/room_registry.dart   # Mapa roomCode -> Room; cria salas via GameEngine.newMatch.
+  lib/bot_driver.dart       # Espelha o loop de bot do app (GameController) no servidor —
+                             # bots em partidas online são jogados pelo próprio servidor.
+  lib/relay_server.dart     # Protocolo JSON sobre WebSocket (createRoom/joinRoom/action).
+  lib/server_content_repository.dart  # Carrega map/rules de server/data/ (sem rootBundle).
+  data/                     # Cópia de data/maps|rules — servidor não acessa assets Flutter.
+  Dockerfile, fly.toml, README.md  # Deploy (Fly.io/Render/Railway/VPS genérica).
+
 lib/
-  game_engine/        # Núcleo puro Dart, sem Flutter, sem UI. Regras do jogo.
-    domain/            # Entidades: Territory, Region, GameMap, Player, Card, Objective...
-    state/             # GameState, GamePhase (state machine), GameAction
-    engine/            # GameEngine (reducer), ReinforcementCalculator, BattleEngine, 
-                        # ObjectiveEngine, BotStrategy, RulesConfig
-    rng/               # SeededRandom determinístico (dice rolls replayáveis)
-  data/                 # Fontes de conteúdo: maps/*.json, cards/*.json, bible content repository
-  content/              # ContentRepository (abstração sobre data/), BibleChallengeEngine
-  services/             # AudioService, HapticsService, AnalyticsService, SaveGameService (abstrações)
+  content/              # ContentRepository (abstração sobre data/, lê de rootBundle)
+  services/             # AudioService, SaveGameService (abstrações + implementações reais)
+  network/              # NetworkClient — cliente WebSocket que fala o mesmo protocolo do servidor
   animations/           # Controllers e specs de animação de batalha/conquista/descoberta
-  multiplayer/          # Interfaces (ActionLog, NetworkTransport) — stubs por agora
   ui/
     design_system/       # tokens: cores, spacing, tipografia, radius
-    screens/              # home, setup, game, game_over
+    screens/              # home, setup, online (lobby/criar/entrar), game, game_over
     widgets/              # MapView (CustomPainter), HUD, dialogs
+    game_controller.dart  # Ponte GameState <-> widgets. Dois modos: local (chama
+                           # GameEngine.apply direto + roda o loop de bot) e online
+                           # (envia GameAction pelo NetworkClient; só muda `state`
+                           # quando o servidor confirma via `stateUpdate` — a mesma
+                           # API pública dos dois modos é o que deixa GameScreen
+                           # agnóstico de qual modo está ativo).
   app.dart / main.dart
 test/
-  game_engine/           # testes unitários da engine (prioridade máxima)
+  ui/game_controller_online_test.dart  # sobe o server package real localmente e
+                                        # verifica dois GameControllers convergindo
+  game_engine/           # (dentro de packages/reinos_engine/test/)
 ```
 
 Regra inegociável: **nenhuma regra de jogo vive em um widget.** Widgets apenas leem `GameState` (via Riverpod) e despacham `GameAction` para o `GameEngine`. O `GameEngine` é testável sem Flutter (`dart test`, sem dependência de `flutter_test` nesse pacote).
@@ -150,8 +176,40 @@ Carregado de `data/rules/default_rules.json`. `GameEngine` recebe `RulesConfig` 
 5. **Escopo gigantesco da especificação** — mitigado pela priorização estrita (seção `TASKS.md`), entregando primeiro o *core loop* jogável antes de qualquer polish, bot avançado, multiplayer ou conteúdo bíblico extenso.
 6. **Flutter SDK não pré-instalado no ambiente de build** — resolvido nesta sessão via clone do SDK (`stable` channel); deixar documentado para CI/outros ambientes.
 
-## 10. Multiplayer / segurança futura (preparação, não implementação)
+## 10. Multiplayer online (implementado)
 
-- Toda decisão de RNG, cartas e objetivos fica **dentro do `GameEngine`**, nunca no widget — pré-requisito para mover a autoridade para um servidor sem reescrever regras.
-- `actionHistory` em `GameState` permite replay determinístico completo a partir do estado inicial + seed.
-- Interfaces (`NetworkTransport`, `ActionLog`) ficam em `lib/multiplayer/` como contratos vazios nesta fase.
+Servidor autoritativo, não apenas "preparação": `server/` é um relay WebSocket
+real (`shelf` + `shelf_web_socket`) que importa `packages/reinos_engine` e
+chama exatamente o mesmo `GameEngine.apply` que o app usa offline — nenhuma
+regra de jogo é reimplementada ou duplicada no servidor.
+
+- **Protocolo:** JSON sobre WebSocket, documentado em `server/README.md`.
+  Mensagens do tipo `createRoom`/`joinRoom`/`action` (cliente → servidor) e
+  `roomCreated`/`joined`/`stateUpdate`/`error` (servidor → cliente).
+- **Autoridade:** o cliente nunca aplica sua própria ação localmente em modo
+  online — `GameController.isOnline` desvia `_dispatch` para enviar a ação ao
+  servidor e só atualiza `state` quando a resposta `stateUpdate` chega. Um
+  jogador só pode agir como si mesmo (`action.playerId` tem que bater com o
+  `playerId` autenticado da conexão) — testado em
+  `server/test/relay_server_test.dart`.
+- **Bots online:** o servidor conduz os turnos de bot sozinho
+  (`server/lib/bot_driver.dart`), espelhando o loop que `GameController`
+  roda localmente no modo offline — nenhum cliente precisa (nem pode) agir
+  por um bot.
+- **Determinismo preservado:** a sala nasce de `GameEngine.newMatch(seed:
+  ...)` no servidor; todo dado é resolvido por `BattleEngine`/`SeededRandom`
+  do lado do servidor, nunca do cliente — a mesma garantia de "RNG nunca
+  influenciado pela UI" vale em modo online.
+- **Verificação real:** `server/test/relay_server_test.dart` sobe o servidor
+  de produção numa porta local e conecta clientes WebSocket crus;
+  `test/ui/game_controller_online_test.dart` sobe o mesmo servidor e conecta
+  dois `GameController`s reais (a classe que `GameScreen` usa) — os dois
+  convergem para o mesmo `GameState` após uma jogada.
+- **Deploy:** `server/Dockerfile` compila um executável AOT (`dart compile
+  exe`); instruções para Fly.io/Render/Railway/VPS em `server/README.md`.
+  **Não verificado nesta sessão:** o `docker build` real (sem daemon Docker
+  disponível neste ambiente) — recomenda-se testar antes do primeiro deploy.
+- **Limitação atual (MVP):** salas online suportam 2 assentos humanos fixos
+  (`p0`/`p1`); mais jogadores/bots em sala online é trabalho futuro — a
+  mesma arquitetura já suporta isso (`GameEngine.newMatch` já aceita N
+  jogadores), falta só a UI de lobby para configurar mais assentos.

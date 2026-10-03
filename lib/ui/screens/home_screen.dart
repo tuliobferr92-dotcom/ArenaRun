@@ -5,6 +5,7 @@ import '../../services/save_game_service.dart';
 import '../design_system/tokens.dart';
 import '../game_controller.dart';
 import 'game_screen.dart';
+import 'online_screen.dart';
 import 'setup_screen.dart';
 
 /// Cinematic-ish home (section 5). Phase 1 keeps it functional; full
@@ -96,6 +97,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       .then((_) => _refreshSaves());
                 },
                 child: const Text('JOGAR'),
+              ),
+              const SizedBox(height: ReinosSpacing.sm),
+              OutlinedButton(
+                onPressed: () {
+                  Navigator.of(context)
+                      .push(MaterialPageRoute(builder: (_) => const OnlineScreen()));
+                },
+                child: const Text('JOGAR ONLINE'),
               ),
               const SizedBox(height: ReinosSpacing.sm),
               TextButton(

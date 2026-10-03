@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -10,6 +12,7 @@ import 'package:reinos_engine/game_engine/engine/game_exceptions.dart';
 import 'package:reinos_engine/game_engine/state/game_action.dart';
 import 'package:reinos_engine/game_engine/state/game_phase.dart';
 import 'package:reinos_engine/game_engine/state/game_state.dart';
+import '../network/network_client.dart';
 import '../services/audio_service.dart';
 import '../services/save_game_service.dart';
 
@@ -43,9 +46,126 @@ class GameController extends StateNotifier<GameState?> {
   int _sequence = 0;
   String? _lastError;
 
+  // ---------------------------------------------------------------------
+  // ONLINE MULTIPLAYER (section 36/37) — when `_network` is set, every
+  // dispatch is sent to the server instead of applied locally; the
+  // server is the sole source of truth and `state` only ever changes in
+  // response to its broadcasts (see `_handleNetworkMessage`).
+  // ---------------------------------------------------------------------
+  NetworkClient? _network;
+  StreamSubscription<Map<String, dynamic>>? _networkSub;
+  String? _roomCode;
+  String? _localPlayerId;
+  Completer<void>? _pendingConnect;
+  void Function(String playerId)? onPlayerConnected;
+  void Function(String playerId)? onPlayerDisconnected;
+
   GameController(this._content, this._saves) : super(null);
 
   String? get lastError => _lastError;
+  bool get isOnline => _network != null;
+  String? get roomCode => _roomCode;
+  String? get localPlayerId => _localPlayerId;
+
+  /// True whenever there's no online seat to gate on (offline/pass-and-play)
+  /// or it's genuinely this device's turn. UI uses this to disable action
+  /// controls while waiting on the remote opponent.
+  bool get isMyTurn => _localPlayerId == null || state?.currentPlayer.id == _localPlayerId;
+
+  /// Connects to [serverUrl], creates a new online room for [players] and
+  /// waits for the server's confirmation before returning. [hostPlayerId]
+  /// must be one of the ids in [players] — the seat this device plays.
+  Future<void> createOnlineRoom({
+    required String serverUrl,
+    required String mapId,
+    required List<PlayerConfig> players,
+    required String hostPlayerId,
+    int seed = 1,
+  }) async {
+    _localPlayerId = hostPlayerId;
+    final network = NetworkClient.connect(serverUrl);
+    _network = network;
+    final connected = Completer<void>();
+    _pendingConnect = connected;
+    _networkSub = network.messages.listen(_handleNetworkMessage);
+    network.createRoom(
+      mapId: mapId,
+      hostPlayerId: hostPlayerId,
+      seed: seed,
+      players: players.map(_encodePlayerConfig).toList(),
+    );
+    return connected.future;
+  }
+
+  /// Connects to [serverUrl] and joins an existing room by [roomCode],
+  /// taking the seat [playerId] (must match one of that room's original
+  /// configs — the server rejects anything else).
+  Future<void> joinOnlineRoom({
+    required String serverUrl,
+    required String roomCode,
+    required String playerId,
+  }) async {
+    _localPlayerId = playerId;
+    final network = NetworkClient.connect(serverUrl);
+    _network = network;
+    final connected = Completer<void>();
+    _pendingConnect = connected;
+    _networkSub = network.messages.listen(_handleNetworkMessage);
+    network.joinRoom(roomCode: roomCode, playerId: playerId);
+    return connected.future;
+  }
+
+  Future<void> disconnectOnline() async {
+    await _networkSub?.cancel();
+    await _network?.dispose();
+    _network = null;
+    _networkSub = null;
+    _roomCode = null;
+    _localPlayerId = null;
+    _pendingConnect = null;
+  }
+
+  Map<String, dynamic> _encodePlayerConfig(PlayerConfig p) => {
+        'id': p.id,
+        'displayName': p.displayName,
+        'color': p.color.name,
+        'isBot': p.isBot,
+        if (p.botDifficulty != null) 'botDifficulty': p.botDifficulty!.name,
+      };
+
+  void _handleNetworkMessage(Map<String, dynamic> message) {
+    switch (message['type']) {
+      case 'roomCreated':
+      case 'joined':
+        _roomCode = message['roomCode'] as String;
+        state = GameState.fromJson(message['state'] as Map<String, dynamic>);
+        _lastError = null;
+        _pendingConnect?.complete();
+        _pendingConnect = null;
+        break;
+
+      case 'stateUpdate':
+        state = GameState.fromJson(message['state'] as Map<String, dynamic>);
+        _lastError = null;
+        break;
+
+      case 'playerConnected':
+        onPlayerConnected?.call(message['playerId'] as String);
+        break;
+
+      case 'playerDisconnected':
+        onPlayerDisconnected?.call(message['playerId'] as String);
+        break;
+
+      case 'error':
+        _lastError = message['message'] as String;
+        if (_pendingConnect != null && !_pendingConnect!.isCompleted) {
+          _pendingConnect!.completeError(StateError(_lastError!));
+          _pendingConnect = null;
+        }
+        break;
+    }
+  }
 
   Future<void> startMatch({
     required String mapId,
@@ -80,6 +200,21 @@ class GameController extends StateNotifier<GameState?> {
     final current = state;
     if (current == null) return;
     final action = build(current.gameId, _sequence++);
+
+    final network = _network;
+    if (network != null) {
+      // Server-authoritative: never apply locally. `state` only changes
+      // once the server's `stateUpdate` broadcast comes back (section 36).
+      if (_roomCode == null || _localPlayerId == null) return;
+      if (current.currentPlayer.id != _localPlayerId) {
+        _lastError = 'Não é sua vez.';
+        return;
+      }
+      network.sendAction(roomCode: _roomCode!, playerId: _localPlayerId!, action: action);
+      _lastError = null;
+      return;
+    }
+
     try {
       state = GameEngine.apply(current, action);
       _lastError = null;
@@ -184,6 +319,7 @@ class GameController extends StateNotifier<GameState?> {
   /// it only decides which `GameAction` to dispatch; `BattleEngine` alone
   /// resolves dice (section 38).
   Future<void> _runBotLoopIfNeeded() async {
+    if (_network != null) return; // the server drives bots in online matches
     var guard = 0;
     while (state != null &&
         state!.phase != GamePhase.gameOver &&
@@ -365,5 +501,12 @@ class GameController extends StateNotifier<GameState?> {
   void debugResetMatch() {
     if (!kDebugMode) return;
     state = null;
+  }
+
+  @override
+  void dispose() {
+    _networkSub?.cancel();
+    _network?.dispose();
+    super.dispose();
   }
 }

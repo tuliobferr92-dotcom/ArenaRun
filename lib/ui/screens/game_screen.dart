@@ -374,6 +374,7 @@ class _GameScreenState extends ConsumerState<GameScreen>
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(gameControllerProvider);
+    final controller = ref.read(gameControllerProvider.notifier);
     if (state == null) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
@@ -382,7 +383,11 @@ class _GameScreenState extends ConsumerState<GameScreen>
       return _GameOverView(state: state);
     }
 
-    if (needsPassAndPlay(state, _revealedPlayerId)) {
+    // Online matches: each player already has their own device, so there's
+    // no shared-screen board to hide (section 56's pass-and-play gate is
+    // offline-only); instead the action controls below are disabled while
+    // it's the remote opponent's turn.
+    if (!controller.isOnline && needsPassAndPlay(state, _revealedPlayerId)) {
       return PassDeviceScreen(
         playerName: state.currentPlayer.displayName,
         onReady: () => setState(() {
@@ -393,12 +398,14 @@ class _GameScreenState extends ConsumerState<GameScreen>
     }
 
     final selected = _selectedOwnId != null ? state.territories[_selectedOwnId] : null;
-    final canEndPhase = switch (state.phase) {
-      GamePhase.reinforcement => state.pendingReinforcements == 0,
-      GamePhase.attack => true,
-      GamePhase.fortification => true,
-      _ => false,
-    };
+    final myTurn = controller.isMyTurn;
+    final canEndPhase = myTurn &&
+        switch (state.phase) {
+          GamePhase.reinforcement => state.pendingReinforcements == 0,
+          GamePhase.attack => true,
+          GamePhase.fortification => true,
+          _ => false,
+        };
 
     return Scaffold(
       body: Stack(
@@ -407,7 +414,7 @@ class _GameScreenState extends ConsumerState<GameScreen>
             child: MapView(
               state: state,
               selectedTerritoryId: _selectedOwnId,
-              onTerritoryTap: (id) => _handleTap(state, id),
+              onTerritoryTap: myTurn ? (id) => _handleTap(state, id) : (_) {},
               pulsingTerritoryId: _pulsingTerritoryId,
               pulseValue: _pulseController.value,
             ),
@@ -417,22 +424,44 @@ class _GameScreenState extends ConsumerState<GameScreen>
             child: GameHud(
               state: state,
               canEndPhase: canEndPhase,
-              onEndPhase: () => ref.read(gameControllerProvider.notifier).endPhase(),
+              onEndPhase: () => controller.endPhase(),
               onShowObjective: () => _showObjective(state),
               onSaveAndExit: _saveAndExit,
               onShowHand: () => _showHand(state),
               onShowEventCards: () => _showEventCards(state),
             ),
           ),
+          if (controller.isOnline && !myTurn)
+            Align(
+              alignment: Alignment.topCenter,
+              child: SafeArea(
+                child: Container(
+                  margin: const EdgeInsets.only(top: 72),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: ReinosSpacing.md,
+                    vertical: ReinosSpacing.sm,
+                  ),
+                  decoration: BoxDecoration(
+                    color: ReinosColors.surface,
+                    borderRadius: BorderRadius.circular(ReinosRadius.md),
+                  ),
+                  child: Text(
+                    'Aguardando ${state.currentPlayer.displayName}...',
+                    style: ReinosTypography.label,
+                  ),
+                ),
+              ),
+            ),
           if (selected != null)
             Align(
               alignment: Alignment.bottomCenter,
               child: _SelectedTerritoryPanel(
                 territory: selected,
                 state: state,
-                onReinforce: state.phase == GamePhase.reinforcement &&
+                onReinforce: myTurn &&
+                        state.phase == GamePhase.reinforcement &&
                         state.pendingReinforcements > 0
-                    ? () => ref.read(gameControllerProvider.notifier).placeArmy(selected.id)
+                    ? () => controller.placeArmy(selected.id)
                     : null,
               ),
             ),

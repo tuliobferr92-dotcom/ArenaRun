@@ -38,14 +38,26 @@ CORE GAME ENGINE → MAP ENGINE → TURN SYSTEM → BATTLE ENGINE → OBJECTIVES
 - Áudio (`AudioManager`), haptics, acessibilidade completa, localização PT/EN/ES, performance (60fps,
   layers separadas), design system completo, analytics (`AnalyticsService`).
 
-## Fase 6 — Multiplayer
-- Ações serializáveis já existentes desde a Fase 1 ganham transporte real (WebSocket), servidor
-  autoritativo para dados/cartas/objetivos/vitória, reconexão com snapshot + replay de `actionHistory`.
-- Modo Igreja (salas privadas), ranking, torneios.
+## Fase 6 — Multiplayer (núcleo implementado)
+- [x] `game_engine` extraído para pacote Dart puro (`packages/reinos_engine`), compartilhado entre
+  app e servidor.
+- [x] `GameAction.toJson()`/`gameActionFromJson` — serialização completa das 8 ações, base do
+  protocolo de rede e do action log.
+- [x] Servidor WebSocket autoritativo (`server/`) — cria salas por código, aplica toda ação via o
+  mesmo `GameEngine.apply`, conduz bots sozinho, rejeita ação em nome de outro jogador.
+- [x] `NetworkClient` (app) + modo online do `GameController` — mesma API pública dos dois modos
+  (local e online), `GameScreen` não precisa saber qual está ativo.
+- [x] UI online mínima: criar sala (gera código) / entrar com código — MVP de 2 assentos fixos.
+- [x] Deploy: Dockerfile (AOT) + instruções Fly.io/Render/Railway/VPS.
+- [ ] Reconexão após queda de conexão (snapshot + replay de `actionHistory` já é possível, falta
+  o fluxo de UI de "reconectando...").
+- [ ] Mais de 2 assentos / bots em salas online (a engine já suporta N jogadores; falta só o lobby).
+- [ ] Modo Igreja (salas privadas com contexto de congregação), ranking, torneios.
 
 ## Mapas futuros (arquitetura já suporta, conteúdo entra por fase)
 Terras Bíblicas (Fase 1-2) · Reinos de Israel · Impérios · Novo Testamento · Viagens de Paulo · Êxodo.
 
 ## Fora de escopo agora (explicitamente adiado)
-Multiplayer online real, economia/monetização, conquistas extensas, todos os mapas, IA de bot avançada,
-conteúdo bíblico extenso — todos modelados na arquitetura, nenhum implementado em profundidade na Fase 1.
+Economia/monetização, conquistas extensas, todos os mapas, conteúdo bíblico extenso, mais de 2
+assentos em salas online, reconexão automática — todos modelados na arquitetura, nenhum
+implementado em profundidade ainda. (Multiplayer online básico saiu desta lista — ver Fase 6.)

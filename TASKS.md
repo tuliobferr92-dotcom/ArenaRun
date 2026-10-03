@@ -203,10 +203,44 @@
 - Suite completa: **188/188 testes passando**, analyzer limpo, build web compilando com os
   arquivos de áudio empacotados.
 
+## Multiplayer online real + bots offline (seções 36/37/38, esta rodada)
+
+- [x] `game_engine` extraído para `packages/reinos_engine` (pacote Dart puro, sem Flutter) —
+  pré-requisito para o servidor rodar exatamente o mesmo código de regras do app.
+- [x] `GameAction.toJson()`/`gameActionFromJson` nas 8 subclasses + `_baseJson()` compartilhado;
+  10 testes de round-trip de serialização.
+- [x] `server/` — relay WebSocket server-authoritative: `Room` (estado autoritativo + action log +
+  sockets conectados), `RoomRegistry` (código de sala `REINO-XXXX`), `BotDriver` (espelha o loop
+  de bot do app, roda do lado do servidor), `RelayServer` (protocolo `createRoom`/`joinRoom`/
+  `action` → `roomCreated`/`joined`/`stateUpdate`/`playerConnected`/`playerDisconnected`/`error`).
+- [x] `server/test/relay_server_test.dart` — sobe o servidor real numa porta local, conecta dois
+  clientes WebSocket crus, verifica sala/sync/rejeição de spoofing de jogador.
+- [x] `lib/network/network_client.dart` + modo online do `GameController` (`createOnlineRoom`/
+  `joinOnlineRoom`/`isOnline`/`isMyTurn`) — mesma API pública dos dois modos, nenhuma duplicação
+  de lógica de UI entre offline/online.
+- [x] `lib/ui/screens/online_screen.dart` — criar sala (mostra código, espera oponente) / entrar
+  com código; `GameScreen` ganha gate de "não é sua vez" (desabilita ações, mostra "Aguardando
+  ...") sem precisar saber se está online ou offline.
+- [x] `test/ui/game_controller_online_test.dart` — sobe o servidor de produção localmente e
+  conecta dois `GameController`s reais (a mesma classe que `GameScreen` usa); confirma que os
+  dois convergem para o mesmo `GameState` após uma jogada e que agir fora da própria vez é
+  rejeitado.
+- [x] `server/Dockerfile` (build AOT, `FROM scratch`), `server/fly.toml`, `server/README.md` com
+  instruções para Fly.io/Render/Railway/VPS. **Nota de honestidade**: o `docker build` real não
+  foi testado nesta sessão (sem daemon Docker disponível no ambiente) — recomendo validar antes
+  do primeiro deploy.
+- [x] Jogo offline contra o computador: já existia desde a Fase 3 (`BotStrategy` +
+  `GameController._runBotLoopIfNeeded`), confirmado/revalidado nesta rodada antes de começar o
+  multiplayer.
+- Suite completa: 93 testes em `packages/reinos_engine`, 2 testes em `server/`, 2 testes novos de
+  integração online + toda a suite anterior do app passando; analyzer limpo nos três pacotes;
+  build web compilando.
+
 ## Fora desta fase (ver ROADMAP.md)
 - [ ] Codex/Enciclopédia completo, Timeline visual, Biblical Knowledge Score por categoria,
   spaced repetition (seções 25/28/32/33) — a base de dados e o pipeline editorial já existem;
   falta a UI de navegação e o cálculo de progresso por categoria.
 - [ ] Revisão editorial humana real do lote de conteúdo bíblico (ver nota acima)
-- [ ] Pass-and-play (ocultar informação privada ao trocar de jogador no mesmo aparelho)
-- [ ] Multiplayer real, áudio real (assets), acessibilidade, localização
+- [ ] Mais de 2 assentos / bots em salas online, reconexão automática após queda de conexão
+- [ ] Assets de áudio profissionais (os atuais são sintetizados — reais, mas não produção de
+  estúdio), acessibilidade, localização

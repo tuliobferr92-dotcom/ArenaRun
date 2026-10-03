@@ -38,6 +38,7 @@ dependencies:
   uuid: ^4.5.1
   path_provider: ^2.1.5
   audioplayers: ^6.1.0
+  web_socket_channel: ^3.0.1
   reinos_engine:
     path: packages/reinos_engine
 
@@ -51,6 +52,14 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^6.0.0
+
+  # Dev-only: lets the online-multiplayer test boot a real local relay
+  # server (the same server package deployed in production) to verify
+  # GameController's networking layer end to end, not just the server in
+  # isolation.
+  shelf: ^1.4.1
+  reinos_server:
+    path: server
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

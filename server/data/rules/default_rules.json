@@ -1,0 +1,13 @@
+{
+  "minReinforcements": 3,
+  "territoriesPerReinforcement": 3,
+  "maxDiceAttacker": 3,
+  "maxDiceDefender": 2,
+  "startingArmiesPerTerritory": 2,
+  "initialPlacementExtraArmies": 3,
+  "minTerritoriesForObjective": 10,
+  "cardTradeInSequence": [4, 6, 8, 10, 12, 15],
+  "cardTradeInIncrementAfterSequence": 5,
+  "eventCardReconstrucaoBonus": 3,
+  "eventCardSabedoriaBonus": 2
+}

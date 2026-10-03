@@ -1,0 +1,21 @@
+name: reinos_server
+description: "Server-authoritative WebSocket relay for REINOS online multiplayer."
+publish_to: 'none'
+version: 1.0.0
+
+environment:
+  sdk: ^3.13.5
+
+dependencies:
+  reinos_engine:
+    path: ../packages/reinos_engine
+  shelf: ^1.4.1
+  shelf_web_socket: ^2.0.1
+  web_socket_channel: ^3.0.1
+  args: ^2.5.0
+  path: ^1.9.0
+
+dev_dependencies:
+  test: ^1.25.0
+  lints: ^5.0.0
+  async: ^2.11.0
