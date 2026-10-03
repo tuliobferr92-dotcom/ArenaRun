@@ -30,6 +30,14 @@ class GameState {
   final List<TerritoryCard> discardPile;
 
   final BattleState? activeBattle;
+
+  /// Set for exactly one state transition — the conquest that completed
+  /// full control of a region nobody else shares (section 17). Like
+  /// [activeBattle], this is presentation-only and cleared on the next
+  /// action; the actual reinforcement bonus is recomputed live every turn
+  /// by `ReinforcementCalculator` regardless of this flag.
+  final String? newlyDominatedRegionId;
+
   final int pendingReinforcements;
 
   /// Whether the current player has conquered at least one territory this
@@ -60,6 +68,7 @@ class GameState {
     required this.rng,
     required this.rules,
     this.activeBattle,
+    this.newlyDominatedRegionId,
     this.pendingReinforcements = 0,
     this.conqueredTerritoryThisTurn = false,
     this.actionHistory = const [],
@@ -150,6 +159,8 @@ class GameState {
     List<TerritoryCard>? discardPile,
     BattleState? activeBattle,
     bool clearActiveBattle = false,
+    String? newlyDominatedRegionId,
+    bool clearNewlyDominatedRegion = false,
     int? pendingReinforcements,
     bool? conqueredTerritoryThisTurn,
     List<GameAction>? actionHistory,
@@ -170,6 +181,9 @@ class GameState {
       rng: rng,
       rules: rules,
       activeBattle: clearActiveBattle ? null : (activeBattle ?? this.activeBattle),
+      newlyDominatedRegionId: clearNewlyDominatedRegion
+          ? null
+          : (newlyDominatedRegionId ?? this.newlyDominatedRegionId),
       pendingReinforcements: pendingReinforcements ?? this.pendingReinforcements,
       conqueredTerritoryThisTurn:
           conqueredTerritoryThisTurn ?? this.conqueredTerritoryThisTurn,

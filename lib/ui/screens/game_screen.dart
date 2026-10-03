@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../animations/battle_sequence_overlay.dart';
+import '../../animations/regional_dominance_banner.dart';
 import '../../game_engine/domain/player.dart';
 import '../../game_engine/domain/territory.dart';
 import '../../game_engine/state/battle_state.dart';
@@ -78,8 +79,27 @@ class _GameScreenState extends ConsumerState<GameScreen>
         audio: ref.read(audioServiceProvider),
         onDismiss: () {
           Navigator.of(dialogContext).pop();
-          if (conquered) _triggerConquestPulse(battle.toTerritoryId);
+          if (conquered) {
+            _triggerConquestPulse(battle.toTerritoryId);
+            final regionId = afterState.newlyDominatedRegionId;
+            if (regionId != null) _showRegionalDominanceBanner(afterState, regionId);
+          }
         },
+      ),
+    );
+  }
+
+  void _showRegionalDominanceBanner(GameState state, String regionId) {
+    final region = state.regions[regionId]!;
+    showGeneralDialog(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: Colors.transparent,
+      transitionDuration: Duration.zero,
+      pageBuilder: (dialogContext, _, _) => RegionalDominanceBanner(
+        regionName: region.name,
+        reinforcementBonus: region.controlBonus,
+        onDismiss: () => Navigator.of(dialogContext).pop(),
       ),
     );
   }

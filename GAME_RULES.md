@@ -63,6 +63,18 @@ O jogador distribui os reforços entre territórios próprios antes de avançar 
 - Extensões futuras (`controlSpecificTerritories`, `eliminatePlayer`, `hybrid`) já modeladas na engine,
   ativadas em fases posteriores.
 
+## Domínio Regional (seção 17)
+- O bônus de reforço por controlar uma região inteira (`Region.controlBonus`) já é recalculado
+  a cada turno pelo `ReinforcementCalculator`, independente de qualquer flag — vale mesmo que o
+  jogador tenha conquistado a região há vários turnos.
+- Quando um ataque conquista o **último** território que faltava para completar o controle de
+  uma região, o `GameEngine` marca `GameState.newlyDominatedRegionId` por uma única transição
+  (como `activeBattle`, é só para a UI comemorar o momento — nunca re-sinaliza uma região que o
+  jogador já controlava).
+- O mapa também destaca de forma persistente, em todo frame, qualquer região atualmente
+  controlada por um único jogador (recalculado ao vivo a partir da posse atual — sobrevive a
+  save/load sem precisar de estado extra).
+
 ## Bot (Fase 1)
 Avalia, em ordem: progresso do próprio objetivo → fronteiras fracas do inimigo mais vulnerável →
 ataque com vantagem numérica mínima configurável. O bot nunca influencia o RNG dos dados.

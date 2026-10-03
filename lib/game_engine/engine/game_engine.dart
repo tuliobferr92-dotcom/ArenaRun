@@ -306,13 +306,35 @@ class GameEngine {
         rolls: [roll],
       ),
       conqueredTerritoryThisTurn: state.conqueredTerritoryThisTurn || conquered,
+      clearNewlyDominatedRegion: true,
     );
 
     if (conquered) {
       next = _checkEliminationAndEliminate(next);
+      final newlyDominated = _findNewlyDominatedRegion(state, next, action.playerId);
+      if (newlyDominated != null) {
+        next = next.copyWith(newlyDominatedRegionId: newlyDominated);
+      }
     }
 
     return next;
+  }
+
+  /// Compares region control before/after a conquest: returns the id of a
+  /// region the player did *not* fully control before this attack but does
+  /// now, or null. `ReinforcementCalculator` already grants the bonus
+  /// every turn regardless — this is purely for the one-shot UI banner.
+  static String? _findNewlyDominatedRegion(
+    GameState before,
+    GameState after,
+    String playerId,
+  ) {
+    for (final regionId in after.regions.keys) {
+      final controlledBefore = before.playerControlsRegion(playerId, regionId);
+      final controlledAfter = after.playerControlsRegion(playerId, regionId);
+      if (!controlledBefore && controlledAfter) return regionId;
+    }
+    return null;
   }
 
   static GameState _checkEliminationAndEliminate(GameState state) {
@@ -418,7 +440,11 @@ class GameEngine {
         return state.copyWith(phase: GamePhase.attack, clearActiveBattle: true);
 
       case GamePhase.attack:
-        return state.copyWith(phase: GamePhase.fortification, clearActiveBattle: true);
+        return state.copyWith(
+          phase: GamePhase.fortification,
+          clearActiveBattle: true,
+          clearNewlyDominatedRegion: true,
+        );
 
       case GamePhase.fortification:
         return _enterCardReward(state);

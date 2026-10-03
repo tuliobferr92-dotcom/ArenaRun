@@ -40,12 +40,30 @@ class MapPainter extends CustomPainter {
     final backgroundPaint = Paint()..color = ReinosColors.surface;
     canvas.drawRect(Rect.fromLTWH(0, 0, size.width, size.height), backgroundPaint);
 
+    final dominatedTerritoryIds = _computeDominatedTerritoryIds();
     for (final territory in state.territories.values) {
-      _paintTerritory(canvas, size, territory);
+      _paintTerritory(canvas, size, territory, dominatedTerritoryIds.contains(territory.id));
     }
   }
 
-  void _paintTerritory(Canvas canvas, Size size, Territory territory) {
+  /// Territories belonging to a region a single player fully controls
+  /// (section 17 "Domínio Regional") — recomputed live from current
+  /// ownership every paint, so the highlight always matches reality even
+  /// after a save/load or a region changing hands.
+  Set<String> _computeDominatedTerritoryIds() {
+    final dominated = <String>{};
+    for (final region in state.regions.values) {
+      if (region.territoryIds.isEmpty) continue;
+      final owner = state.territories[region.territoryIds.first]?.ownerId;
+      if (owner == null) continue;
+      final controlled =
+          region.territoryIds.every((id) => state.territories[id]?.ownerId == owner);
+      if (controlled) dominated.addAll(region.territoryIds);
+    }
+    return dominated;
+  }
+
+  void _paintTerritory(Canvas canvas, Size size, Territory territory, bool isDominated) {
     final path = Path();
     final points = territory.polygon.map((p) => _scale(size, p.dx, p.dy)).toList();
     path.addPolygon(points, true);
@@ -64,6 +82,16 @@ class MapPainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeWidth = territory.id == selectedTerritoryId ? 3 : 1.2;
     canvas.drawPath(path, borderPaint);
+
+    if (isDominated) {
+      canvas.drawPath(
+        path,
+        Paint()
+          ..color = ReinosColors.gold.withValues(alpha: 0.55)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 2.5,
+      );
+    }
 
     if (territory.id == pulsingTerritoryId) {
       final glowOpacity = (1 - (pulseValue - 0.5).abs() * 2).clamp(0.0, 1.0);

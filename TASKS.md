@@ -111,9 +111,21 @@
 - Suite completa: **130/130 testes passando**, `flutter analyze` limpo, `flutter build web`
   compilando.
 
+## Fase 2 (parcial) — Domínio Regional
+
+- [x] `GameState.newlyDominatedRegionId` (transiente, mesmo padrão de `activeBattle`):
+  `GameEngine` o define quando uma conquista completa o controle de uma região que o jogador
+  ainda não controlava por completo, comparando posse antes/depois do ataque.
+- [x] `MapPainter` destaca persistentemente, a cada frame, qualquer região atualmente controlada
+  por um único jogador (recomputado a partir da posse real, sobrevive a save/load).
+- [x] `RegionalDominanceBanner`: comemoração "👑 DOMÍNIO REGIONAL" com o bônus de reforço,
+  auto-dispensável, mostrada após a overlay de batalha quando a conquista completa uma região.
+- [x] 3 testes de engine (detecção, não repetir para região já controlada, sem falso positivo) +
+  2 testes de widget (conteúdo, dismiss por toque).
+- Suite completa: **135/135 testes passando**, analyzer limpo.
+
 ## Fora desta fase (ver ROADMAP.md)
 - [ ] Cartas de evento (Reconstrução, Sabedoria, Tempo de Fartura)
-- [ ] Domínio regional visual (seção 17), destaque de fronteiras durante o ataque
 - [ ] Biblical Knowledge layer, Codex, Timeline, challenges
 - [ ] Pass-and-play (ocultar informação privada ao trocar de jogador no mesmo aparelho)
 - [ ] Multiplayer real, áudio real (assets), acessibilidade, localização
