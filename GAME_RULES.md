@@ -110,6 +110,16 @@ Todos os 5 tipos da seção 18 estão implementados:
 - Cada jogador tem `answeredChallengeIds`/`correctChallengeAnswers`, usados na tela "Sua Jornada"
   pós-partida (territórios descobertos, desafios respondidos corretamente).
 
+## Pass-and-play (seção 56)
+- `SetupScreen` agora separa "número de jogadores" de "jogadores humanos neste aparelho" — o
+  restante são bots. Com 2+ humanos locais, o modo pass-and-play é ativado automaticamente.
+- `needsPassAndPlay(state, revealedPlayerId)` (lógica pura, `lib/ui/widgets/pass_and_play.dart`)
+  decide quando esconder o tabuleiro: verdadeiro sempre que há mais de um humano no aparelho E o
+  jogador da vez é humano E ainda não confirmou "ESTOU PRONTO" para este turno especificamente.
+  Nunca gate no turno de um bot — não há ninguém para esconder informação de bot.
+- `PassDeviceScreen` substitui a tela inteira (mapa, cartas, objetivo — nada vaza) até o próximo
+  jogador tocar "ESTOU PRONTO". Mesmo o primeiro turno da partida passa por essa confirmação.
+
 ## Bot e dificuldade (seção 38)
 - O bot nunca influencia o RNG dos dados — `BotStrategy` só decide **qual** ação pedir;
   `BattleEngine` sempre resolve os dados a partir do mesmo `SeededRandom` compartilhado.

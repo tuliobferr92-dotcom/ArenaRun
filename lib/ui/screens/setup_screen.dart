@@ -21,8 +21,9 @@ String _difficultyLabel(BotDifficulty difficulty) {
   }
 }
 
-/// Minimal setup flow for Phase 1/3: pick player count and bot difficulty,
-/// rest are bots.
+/// Setup flow for Fases 1–3: total player count, how many of them are
+/// humans sharing this device (pass-and-play, section 56) vs bots, and
+/// bot difficulty.
 class SetupScreen extends ConsumerStatefulWidget {
   const SetupScreen({super.key});
 
@@ -32,8 +33,16 @@ class SetupScreen extends ConsumerStatefulWidget {
 
 class _SetupScreenState extends ConsumerState<SetupScreen> {
   int _playerCount = 2;
+  int _localHumans = 1;
   BotDifficulty _botDifficulty = BotDifficulty.normal;
   bool _starting = false;
+
+  void _setPlayerCount(int count) {
+    setState(() {
+      _playerCount = count;
+      if (_localHumans > _playerCount) _localHumans = _playerCount;
+    });
+  }
 
   Future<void> _startMatch() async {
     setState(() => _starting = true);
@@ -44,15 +53,17 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
       PlayerColor.yellow,
     ];
     final configs = [
-      PlayerConfig(id: 'p0', displayName: 'Você', color: colors[0]),
-      for (var i = 1; i < _playerCount; i++)
-        PlayerConfig(
-          id: 'p$i',
-          displayName: 'Bot $i',
-          color: colors[i],
-          isBot: true,
-          botDifficulty: _botDifficulty,
-        ),
+      for (var i = 0; i < _playerCount; i++)
+        if (i < _localHumans)
+          PlayerConfig(id: 'p$i', displayName: 'Jogador ${i + 1}', color: colors[i])
+        else
+          PlayerConfig(
+            id: 'p$i',
+            displayName: 'Bot $i',
+            color: colors[i],
+            isBot: true,
+            botDifficulty: _botDifficulty,
+          ),
     ];
     await ref.read(gameControllerProvider.notifier).startMatch(
           mapId: 'biblical_lands_v1',
@@ -67,6 +78,7 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final botCount = _playerCount - _localHumans;
     return Scaffold(
       appBar: AppBar(title: const Text('Partida Rápida')),
       body: Padding(
@@ -83,23 +95,40 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
               max: 4,
               divisions: 2,
               label: '$_playerCount',
-              onChanged: (v) => setState(() => _playerCount = v.round()),
+              onChanged: (v) => _setPlayerCount(v.round()),
             ),
             const SizedBox(height: ReinosSpacing.md),
-            Text('Dificuldade dos bots', style: ReinosTypography.body),
-            Wrap(
-              spacing: ReinosSpacing.sm,
-              children: BotDifficulty.values.map((difficulty) {
-                return ChoiceChip(
-                  label: Text(_difficultyLabel(difficulty)),
-                  selected: _botDifficulty == difficulty,
-                  onSelected: (_) => setState(() => _botDifficulty = difficulty),
-                );
-              }).toList(),
+            Text('Jogadores humanos neste aparelho', style: ReinosTypography.body),
+            Slider(
+              value: _localHumans.toDouble(),
+              min: 1,
+              max: _playerCount.toDouble(),
+              divisions: _playerCount > 1 ? _playerCount - 1 : null,
+              label: '$_localHumans',
+              onChanged: (v) => setState(() => _localHumans = v.round()),
             ),
+            if (_localHumans > 1)
+              Text(
+                'Modo pass-and-play: o dispositivo será passado entre os jogadores a cada turno.',
+                style: ReinosTypography.label,
+              ),
+            if (botCount > 0) ...[
+              const SizedBox(height: ReinosSpacing.md),
+              Text('Dificuldade dos bots', style: ReinosTypography.body),
+              Wrap(
+                spacing: ReinosSpacing.sm,
+                children: BotDifficulty.values.map((difficulty) {
+                  return ChoiceChip(
+                    label: Text(_difficultyLabel(difficulty)),
+                    selected: _botDifficulty == difficulty,
+                    onSelected: (_) => setState(() => _botDifficulty = difficulty),
+                  );
+                }).toList(),
+              ),
+            ],
             const SizedBox(height: ReinosSpacing.sm),
             Text(
-              'Você + ${_playerCount - 1} bot(s).',
+              '$_localHumans jogador(es) humano(s) + $botCount bot(s).',
               style: ReinosTypography.label,
             ),
             const Spacer(),

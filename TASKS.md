@@ -179,6 +179,15 @@
 - [x] 12 testes novos (8 de engine + 4 de widget).
 - Suite completa: **182/182 testes passando**, analyzer limpo.
 
+## Pass-and-play (seção 56, completo)
+
+- [x] `SetupScreen`: "jogadores humanos neste aparelho" separado do total — o resto são bots.
+- [x] `needsPassAndPlay` (lógica pura, testável sem montar a árvore de widgets) + `PassDeviceScreen`
+  (tela cheia "PASSE O DISPOSITIVO PARA / ESTOU PRONTO"), nunca ativado no turno de um bot.
+- [x] Tela "Sua Jornada" agora mostra uma linha de desafios por jogador humano quando há mais de um.
+- [x] 6 testes novos (5 de lógica pura + 1 de widget).
+- Suite completa: **188/188 testes passando**, analyzer limpo, build web compilando.
+
 ## Fora desta fase (ver ROADMAP.md)
 - [ ] Codex/Enciclopédia completo, Timeline visual, Biblical Knowledge Score por categoria,
   spaced repetition (seções 25/28/32/33) — a base de dados e o pipeline editorial já existem;

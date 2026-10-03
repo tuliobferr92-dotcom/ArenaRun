@@ -17,6 +17,8 @@ import '../widgets/debug_panel.dart';
 import '../widgets/event_card_sheet.dart';
 import '../widgets/hud.dart';
 import '../widgets/map_view.dart';
+import '../widgets/pass_and_play.dart';
+import '../widgets/pass_device_screen.dart';
 import 'home_screen.dart';
 
 class GameScreen extends ConsumerStatefulWidget {
@@ -29,6 +31,12 @@ class GameScreen extends ConsumerStatefulWidget {
 class _GameScreenState extends ConsumerState<GameScreen>
     with SingleTickerProviderStateMixin {
   String? _selectedOwnId;
+
+  /// The id of the human player who last tapped "ESTOU PRONTO" — as long
+  /// as it still matches the current player, the board stays visible.
+  /// Starts null, so even the very first human turn is gated (section 56:
+  /// confirm who's looking before revealing anything).
+  String? _revealedPlayerId;
 
   late final AnimationController _pulseController = AnimationController(
     vsync: this,
@@ -369,6 +377,16 @@ class _GameScreenState extends ConsumerState<GameScreen>
       return _GameOverView(state: state);
     }
 
+    if (needsPassAndPlay(state, _revealedPlayerId)) {
+      return PassDeviceScreen(
+        playerName: state.currentPlayer.displayName,
+        onReady: () => setState(() {
+          _revealedPlayerId = state.currentPlayer.id;
+          _selectedOwnId = null;
+        }),
+      );
+    }
+
     final selected = _selectedOwnId != null ? state.territories[_selectedOwnId] : null;
     final canEndPhase = switch (state.phase) {
       GamePhase.reinforcement => state.pendingReinforcements == 0,
@@ -477,10 +495,10 @@ class _GameOverView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final winner = state.players.firstWhere((p) => p.id == state.winnerId);
-    // "Sua Jornada" (section 31) is written from the human player's point
-    // of view — the setup flow always seats the human as the first,
-    // non-bot player.
-    final human = state.players.firstWhere((p) => !p.isBot, orElse: () => state.players.first);
+    // "Sua Jornada" (section 31) is written from the human players' point
+    // of view — one stat line per human sharing the device (pass-and-play).
+    final humans = state.players.where((p) => !p.isBot).toList();
+    final showPerPlayerLabel = humans.length > 1;
     final discoveredNames =
         state.discoveredTerritoryIds.map((id) => state.territories[id]!.name).toList()..sort();
 
@@ -508,11 +526,14 @@ class _GameOverView extends StatelessWidget {
                       label: 'Territórios descobertos',
                       value: '${state.discoveredTerritoryIds.length}',
                     ),
-                    _JourneyStat(
-                      label: 'Desafios respondidos',
-                      value:
-                          '${human.correctChallengeAnswers}/${human.answeredChallengeIds.length} corretos',
-                    ),
+                    for (final human in humans)
+                      _JourneyStat(
+                        label: showPerPlayerLabel
+                            ? 'Desafios (${human.displayName})'
+                            : 'Desafios respondidos',
+                        value:
+                            '${human.correctChallengeAnswers}/${human.answeredChallengeIds.length} corretos',
+                      ),
                   ],
                 ),
                 if (discoveredNames.isNotEmpty) ...[
