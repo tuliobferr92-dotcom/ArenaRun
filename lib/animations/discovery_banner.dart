@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../content/domain/bible_challenge.dart';
+import '../services/audio_service.dart';
 import '../ui/design_system/tokens.dart';
 import 'bible_challenge_dialog.dart';
 
@@ -9,10 +10,11 @@ import 'bible_challenge_dialog.dart';
 /// right after a territory is conquered for the first time this match.
 /// If there's no challenge for this territory yet (seed content is still
 /// small), it just celebrates the discovery with no quiz offered at all.
-class DiscoveryBanner extends StatelessWidget {
+class DiscoveryBanner extends StatefulWidget {
   final String territoryName;
   final List<String> biblicalReferences;
   final BibleChallenge? challenge;
+  final AudioService audio;
   final void Function(String challengeId, bool correct) onAnswered;
   final VoidCallback onDismiss;
 
@@ -21,19 +23,31 @@ class DiscoveryBanner extends StatelessWidget {
     required this.territoryName,
     required this.biblicalReferences,
     required this.challenge,
+    required this.audio,
     required this.onAnswered,
     required this.onDismiss,
   });
+
+  @override
+  State<DiscoveryBanner> createState() => _DiscoveryBannerState();
+}
+
+class _DiscoveryBannerState extends State<DiscoveryBanner> {
+  @override
+  void initState() {
+    super.initState();
+    widget.audio.play(SoundEvent.bibleDiscovery);
+  }
 
   void _openChallenge(BuildContext context) {
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (_) => BibleChallengeDialog(
-        challenge: challenge!,
-        onAnswered: onAnswered,
+        challenge: widget.challenge!,
+        onAnswered: widget.onAnswered,
       ),
-    ).then((_) => onDismiss());
+    ).then((_) => widget.onDismiss());
   }
 
   @override
@@ -55,10 +69,10 @@ class DiscoveryBanner extends StatelessWidget {
               const Text('📖 DESCOBERTA',
                   style: TextStyle(color: ReinosColors.gold, fontWeight: FontWeight.bold, fontSize: 16)),
               const SizedBox(height: ReinosSpacing.sm),
-              Text(territoryName.toUpperCase(), style: ReinosTypography.title),
-              if (biblicalReferences.isNotEmpty) ...[
+              Text(widget.territoryName.toUpperCase(), style: ReinosTypography.title),
+              if (widget.biblicalReferences.isNotEmpty) ...[
                 const SizedBox(height: ReinosSpacing.sm),
-                Text(biblicalReferences.join(', '), style: ReinosTypography.body),
+                Text(widget.biblicalReferences.join(', '), style: ReinosTypography.body),
               ],
               const SizedBox(height: ReinosSpacing.sm),
               Text(
@@ -70,8 +84,8 @@ class DiscoveryBanner extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  TextButton(onPressed: onDismiss, child: const Text('CONTINUAR JOGANDO')),
-                  if (challenge != null) ...[
+                  TextButton(onPressed: widget.onDismiss, child: const Text('CONTINUAR JOGANDO')),
+                  if (widget.challenge != null) ...[
                     const SizedBox(width: ReinosSpacing.sm),
                     FilledButton(
                       onPressed: () => _openChallenge(context),

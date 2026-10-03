@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../services/audio_service.dart';
 import '../ui/design_system/tokens.dart';
 
 /// One-shot celebration shown when a player completes control of an entire
@@ -11,12 +12,14 @@ import '../ui/design_system/tokens.dart';
 class RegionalDominanceBanner extends StatefulWidget {
   final String regionName;
   final int reinforcementBonus;
+  final AudioService audio;
   final VoidCallback onDismiss;
 
   const RegionalDominanceBanner({
     super.key,
     required this.regionName,
     required this.reinforcementBonus,
+    required this.audio,
     required this.onDismiss,
   });
 
@@ -31,6 +34,7 @@ class _RegionalDominanceBannerState extends State<RegionalDominanceBanner> {
   void initState() {
     super.initState();
     HapticFeedback.mediumImpact();
+    widget.audio.play(SoundEvent.achievementUnlocked);
     _autoDismissTimer = Timer(const Duration(seconds: 3), widget.onDismiss);
   }
 

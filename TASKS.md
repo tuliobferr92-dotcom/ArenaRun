@@ -188,6 +188,21 @@
 - [x] 6 testes novos (5 de lógica pura + 1 de widget).
 - Suite completa: **188/188 testes passando**, analyzer limpo, build web compilando.
 
+## Áudio real (seção 40)
+
+- [x] 7 efeitos sonoros gerados por síntese procedural (onda senoidal/ruído filtrado via script
+  Python, sem nenhum asset de terceiros): `dice_roll`, `battle_impact`, `territory_conquered`,
+  `card_draw`, `achievement_unlocked`, `bible_discovery`, `ui_tap`. **Nota de honestidade**: são
+  efeitos sintetizados, não produção de áudio profissional — mas são reais e audíveis, não silêncio.
+  Trocáveis por assets definitivos depois sem tocar em nenhum call site.
+- [x] `AssetAudioService` (pacote `audioplayers`) substitui o `NoOpAudioService` como padrão;
+  `NoOpAudioService` continua existindo para testes puros. `setMuted` adicionado à interface
+  (seção 41 "efeitos sonoros off") + botão de mudo na Home.
+- [x] Sons já disparam nos momentos reais de jogo: dados/impacto/conquista na sequência de
+  batalha, descoberta bíblica, domínio regional, compra de carta.
+- Suite completa: **188/188 testes passando**, analyzer limpo, build web compilando com os
+  arquivos de áudio empacotados.
+
 ## Fora desta fase (ver ROADMAP.md)
 - [ ] Codex/Enciclopédia completo, Timeline visual, Biblical Knowledge Score por categoria,
   spaced repetition (seções 25/28/32/33) — a base de dados e o pipeline editorial já existem;

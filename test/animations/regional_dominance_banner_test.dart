@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:reinos/animations/regional_dominance_banner.dart';
+import 'package:reinos/services/audio_service.dart';
 
 void main() {
   testWidgets('shows the region name and reinforcement bonus', (tester) async {
     await tester.pumpWidget(
-      const MaterialApp(
+      MaterialApp(
         home: RegionalDominanceBanner(
           regionName: 'Canaã',
           reinforcementBonus: 3,
+          audio: NoOpAudioService(),
           onDismiss: _noop,
         ),
       ),
@@ -28,6 +30,7 @@ void main() {
         home: RegionalDominanceBanner(
           regionName: 'Canaã',
           reinforcementBonus: 3,
+          audio: NoOpAudioService(),
           onDismiss: () => dismissed = true,
         ),
       ),

@@ -10,6 +10,7 @@ import '../../game_engine/domain/territory.dart';
 import '../../game_engine/state/battle_state.dart';
 import '../../game_engine/state/game_phase.dart';
 import '../../game_engine/state/game_state.dart';
+import '../../services/audio_service.dart';
 import '../design_system/tokens.dart';
 import '../game_controller.dart';
 import '../widgets/card_hand_sheet.dart';
@@ -124,6 +125,7 @@ class _GameScreenState extends ConsumerState<GameScreen>
       pageBuilder: (dialogContext, _, _) => RegionalDominanceBanner(
         regionName: region.name,
         reinforcementBonus: region.controlBonus,
+        audio: ref.read(audioServiceProvider),
         onDismiss: () => Navigator.of(dialogContext).pop(),
       ),
     );
@@ -148,6 +150,7 @@ class _GameScreenState extends ConsumerState<GameScreen>
         territoryName: territory.name,
         biblicalReferences: territory.biblicalReferences,
         challenge: challenge,
+        audio: ref.read(audioServiceProvider),
         onAnswered: (challengeId, correct) =>
             ref.read(gameControllerProvider.notifier).answerChallenge(challengeId, correct),
         onDismiss: () => Navigator.of(dialogContext).pop(),
@@ -320,6 +323,7 @@ class _GameScreenState extends ConsumerState<GameScreen>
           if (error != null) {
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error)));
           } else {
+            ref.read(audioServiceProvider).play(SoundEvent.cardDraw);
             Navigator.of(sheetContext).pop();
           }
         },
@@ -342,6 +346,7 @@ class _GameScreenState extends ConsumerState<GameScreen>
           if (error != null) {
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error)));
           } else {
+            ref.read(audioServiceProvider).play(SoundEvent.cardDraw);
             Navigator.of(sheetContext).pop();
           }
         },

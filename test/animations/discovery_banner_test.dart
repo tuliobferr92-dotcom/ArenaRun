@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:reinos/animations/discovery_banner.dart';
 import 'package:reinos/content/domain/bible_challenge.dart';
 import 'package:reinos/content/domain/content_review_status.dart';
+import 'package:reinos/services/audio_service.dart';
 
 BibleChallenge _challenge() => const BibleChallenge(
       id: 'c1',
@@ -27,6 +28,7 @@ void main() {
           territoryName: 'Jericó',
           biblicalReferences: const ['Josué 6'],
           challenge: null,
+          audio: NoOpAudioService(),
           onAnswered: (_, _) {},
           onDismiss: () {},
         ),
@@ -47,6 +49,7 @@ void main() {
           territoryName: 'Jericó',
           biblicalReferences: const ['Josué 6'],
           challenge: _challenge(),
+          audio: NoOpAudioService(),
           onAnswered: (_, _) {},
           onDismiss: () => dismissed = true,
         ),
@@ -72,6 +75,7 @@ void main() {
           territoryName: 'Jericó',
           biblicalReferences: const ['Josué 6'],
           challenge: _challenge(),
+          audio: NoOpAudioService(),
           onAnswered: (id, correct) {
             answeredId = id;
             wasCorrect = correct;

@@ -18,11 +18,17 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   List<SaveSummary> _saves = const [];
+  bool _soundMuted = false;
 
   @override
   void initState() {
     super.initState();
     _refreshSaves();
+  }
+
+  void _toggleSound() {
+    setState(() => _soundMuted = !_soundMuted);
+    ref.read(audioServiceProvider).setMuted(_soundMuted);
   }
 
   Future<void> _refreshSaves() async {
@@ -41,6 +47,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget build(BuildContext context) {
     final hasSave = _saves.isNotEmpty;
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        actions: [
+          IconButton(
+            onPressed: _toggleSound,
+            icon: Icon(
+              _soundMuted ? Icons.volume_off : Icons.volume_up,
+              color: ReinosColors.parchment,
+            ),
+            tooltip: _soundMuted ? 'Ativar som' : 'Desativar som',
+          ),
+        ],
+      ),
+      extendBodyBehindAppBar: true,
       body: DecoratedBox(
         decoration: const BoxDecoration(
           gradient: LinearGradient(

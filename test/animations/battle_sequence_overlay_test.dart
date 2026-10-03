@@ -8,6 +8,8 @@ class _RecordingAudioService implements AudioService {
   final List<SoundEvent> played = [];
   @override
   void play(SoundEvent event) => played.add(event);
+  @override
+  void setMuted(bool muted) {}
 }
 
 Future<void> _pumpOverlay(

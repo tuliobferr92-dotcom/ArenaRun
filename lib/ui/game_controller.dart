@@ -22,7 +22,7 @@ final saveGameServiceProvider = Provider<SaveGameService>((ref) {
 });
 
 final audioServiceProvider = Provider<AudioService>((ref) {
-  return NoOpAudioService();
+  return AssetAudioService();
 });
 
 final bibleChallengesProvider = FutureProvider<List<BibleChallenge>>((ref) {
