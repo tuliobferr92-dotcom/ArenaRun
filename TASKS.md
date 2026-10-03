@@ -42,9 +42,16 @@
 ## Resultado da verificação (Fase 1)
 
 - `flutter analyze` → **0 problemas**.
-- `flutter test` → **24/24 testes passando** (reforços, RNG seedado, batalha/dados,
+- `flutter test` → **114/114 testes passando** (reforços, RNG seedado, batalha/dados,
   validação de adjacência/ações inválidas, conquista, ciclo de turno completo,
   objetivos, eliminação/vitória por sobrevivência).
+- **Simulação de partida completa** (`test/game_engine/simulation_test.dart`): 90 partidas
+  simuladas (2/3/4 bots × 30 seeds) no mapa de produção real (`biblical_lands_v1.json`),
+  cada bot jogando via `BotStrategy` do início ao fim sem intervenção humana. Todas as 90
+  terminam em `GamePhase.gameOver` com um vencedor válido, sem soft-locks, sem exceções e
+  sem duplicação de exércitos (`totalArmies` conservado). Esse é o teste mais forte de que
+  o core loop funciona de fato — um teste unitário isolado pode passar mesmo que uma partida
+  real trave ou nunca termine.
 - `flutter build web --release` → **compila com sucesso** (usado como verificação de
   compilação de ponta a ponta; o alvo real do produto é iOS/Android — não há
   Android SDK, Xcode, Chrome ou GTK3-dev disponíveis neste ambiente headless para
