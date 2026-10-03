@@ -39,6 +39,7 @@ class GameHud extends StatelessWidget {
   final GameState state;
   final VoidCallback onEndPhase;
   final VoidCallback onShowObjective;
+  final VoidCallback onSaveAndExit;
   final bool canEndPhase;
 
   const GameHud({
@@ -46,6 +47,7 @@ class GameHud extends StatelessWidget {
     required this.state,
     required this.onEndPhase,
     required this.onShowObjective,
+    required this.onSaveAndExit,
     required this.canEndPhase,
   });
 
@@ -72,6 +74,11 @@ class GameHud extends StatelessWidget {
                     ),
                 ],
               ),
+            ),
+            IconButton(
+              onPressed: onSaveAndExit,
+              icon: const Icon(Icons.save_outlined, color: ReinosColors.parchment),
+              tooltip: 'Salvar e sair',
             ),
             IconButton(
               onPressed: onShowObjective,

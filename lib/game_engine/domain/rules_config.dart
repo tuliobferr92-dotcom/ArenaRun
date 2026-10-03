@@ -32,6 +32,16 @@ class RulesConfig {
     );
   }
 
+  Map<String, dynamic> toJson() => {
+        'minReinforcements': minReinforcements,
+        'territoriesPerReinforcement': territoriesPerReinforcement,
+        'maxDiceAttacker': maxDiceAttacker,
+        'maxDiceDefender': maxDiceDefender,
+        'startingArmiesPerTerritory': startingArmiesPerTerritory,
+        'initialPlacementExtraArmies': initialPlacementExtraArmies,
+        'minTerritoriesForObjective': minTerritoriesForObjective,
+      };
+
   static const RulesConfig defaults = RulesConfig(
     minReinforcements: 3,
     territoriesPerReinforcement: 3,

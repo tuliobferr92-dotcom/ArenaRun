@@ -65,9 +65,31 @@
   em qualquer backend (VM, AOT, JS/Wasm) — essencial para o requisito de replay
   determinístico entre plataformas (ARCHITECTURE.md seção 9).
 
+## Fase 2 (parcial) — Save/Load + Debug Mode
+
+- [x] Serialização JSON completa de `GameState` (`toJson`/`fromJson`), incluindo
+  `Objective`, `TerritoryCard`, `Player`, `RulesConfig` e o estado exato do RNG
+  (`SeededRandom.fromState`) — uma partida restaurada produz a mesma sequência de
+  dados que teria produzido sem nunca ter sido salva.
+- [x] `SaveGameService` (abstração) + `FileSaveGameService` (implementação em
+  arquivo local via `path_provider`): salvar, carregar, listar, apagar.
+- [x] Home: botão "CONTINUAR PARTIDA" mostra o save mais recente e carrega.
+- [x] Tela de jogo: botão "Salvar e sair" no HUD.
+- [x] Debug Mode (`kDebugMode` apenas — ausente de builds release): dar tropas,
+  conquistar território instantaneamente, saltar fase, dar carta, completar
+  objetivo (vencer), resetar partida.
+- [x] Teste de round-trip de serialização + RNG restaurado continua a mesma
+  sequência de dados do original.
+- **Bug real encontrado e corrigido durante a verificação:** `Territory.fromJson`
+  nunca lia `ownerId`/`armyCount` do JSON (só `toJson` os escrevia) — todo território
+  restaurado de um save voltava sem dono. Só apareceu ao testar o round-trip
+  completo, não nos testes unitários anteriores (que nunca serializavam territórios
+  com `ownerId` já atribuído antes do bug existir).
+- Suite completa: **116/116 testes passando**, `flutter analyze` limpo.
+
 ## Fora desta fase (ver ROADMAP.md)
 - [ ] Cartas de evento completas, troca de cartas territoriais
 - [ ] Animações de batalha completas, domínio regional visual
 - [ ] Biblical Knowledge layer, Codex, Timeline, challenges
-- [ ] Save/load completo, debug mode, pass-and-play
+- [ ] Pass-and-play (ocultar informação privada ao trocar de jogador no mesmo aparelho)
 - [ ] Multiplayer real, áudio, haptics, acessibilidade, localização

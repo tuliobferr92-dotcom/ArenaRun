@@ -27,4 +27,20 @@ class Objective {
     required this.description,
     required this.params,
   });
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'type': type.name,
+        'description': description,
+        'params': params,
+      };
+
+  factory Objective.fromJson(Map<String, dynamic> json) {
+    return Objective(
+      id: json['id'] as String,
+      type: ObjectiveType.values.byName(json['type'] as String),
+      description: json['description'] as String,
+      params: Map<String, dynamic>.from(json['params'] as Map),
+    );
+  }
 }

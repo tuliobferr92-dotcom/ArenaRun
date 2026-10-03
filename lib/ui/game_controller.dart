@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../content/content_repository.dart';
@@ -8,14 +9,19 @@ import '../game_engine/engine/game_exceptions.dart';
 import '../game_engine/state/game_action.dart';
 import '../game_engine/state/game_phase.dart';
 import '../game_engine/state/game_state.dart';
+import '../services/save_game_service.dart';
 
 final contentRepositoryProvider = Provider<ContentRepository>((ref) {
   return AssetContentRepository();
 });
 
+final saveGameServiceProvider = Provider<SaveGameService>((ref) {
+  return FileSaveGameService();
+});
+
 final gameControllerProvider =
     StateNotifierProvider<GameController, GameState?>((ref) {
-  return GameController(ref.read(contentRepositoryProvider));
+  return GameController(ref.read(contentRepositoryProvider), ref.read(saveGameServiceProvider));
 });
 
 /// Bridges `GameEngine` (pure Dart) to the widget tree. Holds no rules of
@@ -23,10 +29,11 @@ final gameControllerProvider =
 /// the bot "AI turn loop" so human players never have to drive bot actions.
 class GameController extends StateNotifier<GameState?> {
   final ContentRepository _content;
+  final SaveGameService _saves;
   int _sequence = 0;
   String? _lastError;
 
-  GameController(this._content) : super(null);
+  GameController(this._content, this._saves) : super(null);
 
   String? get lastError => _lastError;
 
@@ -38,6 +45,24 @@ class GameController extends StateNotifier<GameState?> {
     final GameMap map = await _content.loadMap(mapId);
     final rules = await _content.loadRules();
     state = GameEngine.newMatch(map: map, configs: players, rules: rules, seed: seed);
+    await _runBotLoopIfNeeded();
+  }
+
+  /// Persists the current match (section 39). Safe to call mid-turn — the
+  /// full `GameState` (including the RNG's exact position) is captured, so
+  /// resuming later produces an identical continuation.
+  Future<void> saveMatch() async {
+    final current = state;
+    if (current == null) return;
+    await _saves.save(current);
+  }
+
+  Future<List<SaveSummary>> listSaves() => _saves.listSaves();
+
+  Future<void> loadMatch(String gameId) async {
+    final loaded = await _saves.load(gameId);
+    if (loaded == null) return;
+    state = loaded;
     await _runBotLoopIfNeeded();
   }
 
@@ -210,5 +235,65 @@ class GameController extends StateNotifier<GameState?> {
           timestamp: DateTime.now(),
           sequenceNumber: seq,
         ));
+  }
+
+  // ---------------------------------------------------------------------
+  // DEBUG MODE (section 47) — direct state edits that bypass GameEngine
+  // validation entirely. Gated by kDebugMode so they are physically absent
+  // from release builds, never just hidden in the UI.
+  // ---------------------------------------------------------------------
+
+  void debugGiveArmies(String territoryId, int count) {
+    if (!kDebugMode) return;
+    final current = state;
+    if (current == null) return;
+    final territory = current.territories[territoryId];
+    if (territory == null) return;
+    final territories = Map.of(current.territories);
+    territories[territoryId] = territory.copyWith(armyCount: territory.armyCount + count);
+    state = current.copyWith(territories: territories);
+  }
+
+  void debugConquerTerritory(String territoryId) {
+    if (!kDebugMode) return;
+    final current = state;
+    if (current == null) return;
+    final territory = current.territories[territoryId];
+    if (territory == null) return;
+    final territories = Map.of(current.territories);
+    territories[territoryId] =
+        territory.copyWith(ownerId: current.currentPlayer.id, armyCount: 1);
+    state = current.copyWith(territories: territories, conqueredTerritoryThisTurn: true);
+  }
+
+  void debugSkipToPhase(GamePhase phase) {
+    if (!kDebugMode) return;
+    final current = state;
+    if (current == null) return;
+    state = current.copyWith(phase: phase, pendingReinforcements: 0, clearActiveBattle: true);
+  }
+
+  void debugCompleteObjective() {
+    if (!kDebugMode) return;
+    final current = state;
+    if (current == null) return;
+    state = current.copyWith(phase: GamePhase.gameOver, winnerId: current.currentPlayer.id);
+  }
+
+  void debugGiveCard() {
+    if (!kDebugMode) return;
+    final current = state;
+    if (current == null || current.deck.isEmpty) return;
+    final deck = List.of(current.deck);
+    final drawn = deck.removeAt(0);
+    final players = current.players
+        .map((p) => p.id == current.currentPlayer.id ? p.copyWith(cards: [...p.cards, drawn]) : p)
+        .toList();
+    state = current.copyWith(deck: deck, players: players);
+  }
+
+  void debugResetMatch() {
+    if (!kDebugMode) return;
+    state = null;
   }
 }

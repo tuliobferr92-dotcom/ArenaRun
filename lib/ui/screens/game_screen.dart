@@ -6,6 +6,7 @@ import '../../game_engine/state/game_phase.dart';
 import '../../game_engine/state/game_state.dart';
 import '../design_system/tokens.dart';
 import '../game_controller.dart';
+import '../widgets/debug_panel.dart';
 import '../widgets/hud.dart';
 import '../widgets/map_view.dart';
 import 'home_screen.dart';
@@ -153,6 +154,17 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     );
   }
 
+  Future<void> _saveAndExit() async {
+    await ref.read(gameControllerProvider.notifier).saveMatch();
+    if (!mounted) return;
+    // Pushes a fresh HomeScreen (rather than popping back to a stale one)
+    // so its save-slot list re-reads disk and immediately reflects this save.
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (_) => const HomeScreen()),
+      (route) => false,
+    );
+  }
+
   void _showObjective(GameState state) {
     showDialog(
       context: context,
@@ -206,6 +218,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
               canEndPhase: canEndPhase,
               onEndPhase: () => ref.read(gameControllerProvider.notifier).endPhase(),
               onShowObjective: () => _showObjective(state),
+              onSaveAndExit: _saveAndExit,
             ),
           ),
           if (selected != null)
@@ -222,6 +235,14 @@ class _GameScreenState extends ConsumerState<GameScreen> {
             ),
         ],
       ),
+      floatingActionButton: isDebugModeAvailable
+          ? FloatingActionButton.small(
+              backgroundColor: ReinosColors.bronze,
+              tooltip: 'Debug Mode',
+              onPressed: () => showDebugPanel(context, ref, state, _selectedOwnId),
+              child: const Icon(Icons.bug_report),
+            )
+          : null,
     );
   }
 }

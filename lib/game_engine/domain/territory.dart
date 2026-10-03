@@ -68,6 +68,8 @@ class Territory {
       biblicalReferences: (json['biblicalReferences'] as List? ?? []).cast<String>(),
       historicalPeriodId: json['historicalPeriodId'] as String? ?? '',
       description: json['description'] as String? ?? '',
+      ownerId: json['ownerId'] as String?,
+      armyCount: json['armyCount'] as int? ?? 0,
     );
   }
 

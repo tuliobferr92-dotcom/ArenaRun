@@ -15,6 +15,11 @@ class SeededRandom {
 
   SeededRandom(int seed) : _state = _normalize(seed);
 
+  /// Restores a generator from a previously-saved [state] (not a seed) —
+  /// used by save/load so a resumed match produces the exact same future
+  /// dice sequence as if it had never been saved.
+  SeededRandom.fromState(this._state);
+
   static int _normalize(int seed) {
     final masked = seed & 0xFFFFFFFF;
     return masked == 0 ? 0x9E3779B9 : masked;
@@ -52,7 +57,5 @@ class SeededRandom {
     return list;
   }
 
-  SeededRandom clone() => SeededRandom(0).._setState(_state);
-
-  void _setState(int s) => _state = s;
+  SeededRandom clone() => SeededRandom.fromState(_state);
 }

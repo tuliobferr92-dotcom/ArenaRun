@@ -13,4 +13,18 @@ class TerritoryCard {
     required this.territoryId,
     required this.symbol,
   });
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'territoryId': territoryId,
+        'symbol': symbol.name,
+      };
+
+  factory TerritoryCard.fromJson(Map<String, dynamic> json) {
+    return TerritoryCard(
+      id: json['id'] as String,
+      territoryId: json['territoryId'] as String,
+      symbol: CardSymbol.values.byName(json['symbol'] as String),
+    );
+  }
 }

@@ -63,6 +63,66 @@ class GameState {
 
   Player get currentPlayer => players[currentPlayerIndex];
 
+  /// Full save-game snapshot (section 39). Deliberately omits
+  /// [actionHistory] — a complete replayable log is a Phase 3 concern
+  /// (ARCHITECTURE.md section 10); resuming a paused match only needs this
+  /// snapshot plus the RNG's exact internal [SeededRandom.state], which is
+  /// included so the dice sequence after loading is identical to what it
+  /// would have been had the match never been saved.
+  Map<String, dynamic> toJson() => {
+        'gameId': gameId,
+        'mapId': mapId,
+        'regions': regions.values.map((r) => r.toJson()).toList(),
+        'territories': territories.values.map((t) => t.toJson()).toList(),
+        'players': players.map((p) => p.toJson()).toList(),
+        'currentPlayerIndex': currentPlayerIndex,
+        'phase': phase.name,
+        'turnNumber': turnNumber,
+        'deck': deck.map((c) => c.toJson()).toList(),
+        'discardPile': discardPile.map((c) => c.toJson()).toList(),
+        'pendingReinforcements': pendingReinforcements,
+        'conqueredTerritoryThisTurn': conqueredTerritoryThisTurn,
+        'rngState': rng.state,
+        'rules': rules.toJson(),
+        'winnerId': winnerId,
+      };
+
+  factory GameState.fromJson(Map<String, dynamic> json) {
+    final regions = <String, Region>{};
+    for (final r in (json['regions'] as List)) {
+      final region = Region.fromJson(r as Map<String, dynamic>);
+      regions[region.id] = region;
+    }
+    final territories = <String, Territory>{};
+    for (final t in (json['territories'] as List)) {
+      final territory = Territory.fromJson(t as Map<String, dynamic>);
+      territories[territory.id] = territory;
+    }
+    return GameState(
+      gameId: json['gameId'] as String,
+      mapId: json['mapId'] as String,
+      regions: regions,
+      territories: territories,
+      players: (json['players'] as List)
+          .map((p) => Player.fromJson(p as Map<String, dynamic>))
+          .toList(),
+      currentPlayerIndex: json['currentPlayerIndex'] as int,
+      phase: GamePhase.values.byName(json['phase'] as String),
+      turnNumber: json['turnNumber'] as int,
+      deck: (json['deck'] as List)
+          .map((c) => TerritoryCard.fromJson(c as Map<String, dynamic>))
+          .toList(),
+      discardPile: (json['discardPile'] as List)
+          .map((c) => TerritoryCard.fromJson(c as Map<String, dynamic>))
+          .toList(),
+      rng: SeededRandom.fromState(json['rngState'] as int),
+      rules: RulesConfig.fromJson(json['rules'] as Map<String, dynamic>),
+      pendingReinforcements: json['pendingReinforcements'] as int,
+      conqueredTerritoryThisTurn: json['conqueredTerritoryThisTurn'] as bool,
+      winnerId: json['winnerId'] as String?,
+    );
+  }
+
   List<Territory> territoriesOwnedBy(String playerId) =>
       territories.values.where((t) => t.ownerId == playerId).toList();
 
